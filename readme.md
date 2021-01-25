@@ -2,8 +2,9 @@
 
 ## files
 
-* `01-map-points.R` downloads shapefiles for aop boxes, domains, reaches, watersheds
-* `02-chem-sw.R` unzips and organizes sw chem data by site
+* `01-download-data.R` downloads shapefiles for aop boxes, domains, reaches, watersheds,
+unzips and organizes sw chem data by site
+* `02-chem-locations.R` 
 
 ## notes 
 
