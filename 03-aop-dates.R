@@ -15,6 +15,7 @@ data_id <- 'DP1.30010.001' # digital camera 10cm imagery
 
 req_aop <- GET(glue('{base_url}/products/{data_id}'))
 avail_aop <- content(req_aop, as = 'text') %>% 
+  # readLines() %>%
   fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
 
 # List of products by site code with month
@@ -30,20 +31,33 @@ avail_df <- data_urls_list %>%
   mutate(month = str_sub(., 6, 12)) %>%
   dplyr::select(siteid, month)
 
+my_url <- data_urls[180]
 # actual files available
-data_files_req <- GET(data_urls[1])
-data_files <- content(data_files_req, as = "text") %>% fromJSON()
+get_img_datetimes <- function(my_url){
+  data_files_req <- GET(my_url)
+  content(data_files_req)
+  data_files <- content(data_files_req, as = "text") %>% fromJSON()
+  # filter to just the tifs
+  imgs <- data_files$data$files$name %>% fs::path_filter("*ort.tif")
+  # extract image dates from parenthesis
+  img_datetimes <- imgs %>% 
+    str_match_all("(?<=\\().+?(?=\\))") %>% 
+    unlist() %>% sort() %>% lubridate::as_datetime()
+  # one row data frame of results
+  meta <- data.frame(siteid = data_files$data$siteCode,
+             month = data_files$data$month,
+             first_img = head(img_datetimes, 1),
+             last_img = tail(img_datetimes, 1))
+  return(meta)
+}
 
-data_files$data$month
-data_files$data$files$name[1]
+aop_meta_df <- data_urls %>% purrr::map_df(~get_img_datetimes(.x))
+# data_files_req <- GET(data_urls[1])
+# data_files <- content(data_files_req, as = "text") %>% fromJSON()
+# 
+# data_files$data$siteCode
+# data_files$data$month
+# data_files$data$files$name[1]
 #  Digital camera: FLHTSTRT_EHCCCCCC(IMAGEDATETIME)-NNNN_ort.tif
 # IMAGEDATETIME: Date and time of image capture, YYYYMMDDHHmmSS
 
-# filter to just the tifs
-imgs <- data_files$data$files$name %>% fs::path_filter("*ort.tif")
-# extract image dates from parenthesis
-img_datetimes <- imgs %>% 
-  str_match_all("(?<=\\().+?(?=\\))") %>% 
-  unlist() %>% sort() %>% lubridate::as_datetime()
-
-img_datetimes %>% range()
