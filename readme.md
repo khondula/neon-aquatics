@@ -2,10 +2,11 @@
 
 ## files
 
-* `01-download-data.R` downloads shapefiles for aop boxes, domains, reaches, watersheds,
+* `01-download-data.R` - downloads shapefiles for aop boxes, domains, reaches, watersheds,
 unzips and organizes sw chem data by site
-* `02-chem-locations.R` save shapefile of coordinates for sampling locations
-* `03-aop-dates.R` get image datetimes using neon api
+* `02-swchem-meta.R` - save shapefile of coordinates for sampling locations
+* `03-aop-dates.R` - get image datetimes using neon api
+* `04-swchem-data.R` - pull all values 
 
 ## notes 
 
@@ -19,3 +20,10 @@ notes from [geoNEON](https://github.com/NEONScience/NEON-geolocation/tree/master
 
 * fielddata basic file contains a named location eg "HOPB.AOS.S2" and a collectDate eg 2020-12-08T15:08Z
 * fieldSuperParent contains named location, decimal lat and lon, elevation, datum, collect date again, event Id, sampler Type (eg Grab)
+
+## AOP flight collection times
+
+* image date time should be between parentheses but not consistent
+* Digital camera: FLHTSTRT_EHCCCCCC(IMAGEDATETIME)-NNNN_ort.tif
+* IMAGEDATETIME: Date and time of image capture, YYYYMMDDHHmmSS
+parse datetime with lubridate? 

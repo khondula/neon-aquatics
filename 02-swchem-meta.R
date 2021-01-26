@@ -53,7 +53,4 @@ sites_x_aop %>% write_csv('results/sites_x_aop.csv')
 # BLUE has 2 overlapping flight boxes, one small one big
 # REDB AOS S2 location has 2 overlapping points
 
-# actual values in here
-# lab_files <- fs::dir_ls(glue('{chem_dir}/HOPB'), glob = "*externalLab*")
-# hopb_chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
-# hopb_doc <- hopb_chem_df %>% dplyr::filter(analyte == 'DOC')
+
