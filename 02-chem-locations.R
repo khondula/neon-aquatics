@@ -34,7 +34,25 @@ sites_sf %>% st_write(glue('{sites_dir}/swchem_sites.shp'))
 sites_sf <- st_read(glue('{sites_dir}/swchem_sites.shp')) %>% rename(namedLocation = 3)
 
 # read in AOP locations
-sites_sf %>% leaflet() %>% addTiles() %>% addMarkers(popup = ~namedLocation)
+aop_boxes <- st_read(glue('{data_dir}/aop_boxes/AOP_flightboxesAllSites.shp'))
+
+sites_sf %>% leaflet() %>% addTiles() %>% 
+  addMarkers(popup = ~namedLocation) %>%
+  addPolygons(data = aop_boxes, popup = ~flightbxID)
+
+# aop_boxes have different names for aq and terrestrial but same box ID
+# 99 rows in flight boxes data, 70 unique IDs
+aop_boxes$flightbxID %>% unique() %>% length()
+
+aop_boxes_unique <- aop_boxes %>% 
+  arrange(domain, sampleType) %>%
+  group_by(domain, domainName, flightbxID) %>% distinct()
+
+sites_x_aop <- sites_sf %>% st_join(aop_boxes_unique, left = TRUE)
+sites_x_aop %>% write_csv('results/sites_x_aop.csv')
+# BLUE has 2 overlapping flight boxes, one small one big
+# REDB AOS S2 location has 2 overlapping points
+
 # actual values in here
 # lab_files <- fs::dir_ls(glue('{chem_dir}/HOPB'), glob = "*externalLab*")
 # hopb_chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))

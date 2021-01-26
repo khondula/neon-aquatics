@@ -1,0 +1,49 @@
+# Get timing of images for AOP data
+# adapted from
+# https://www.neonscience.org/resources/learning-hub/tutorials/neon-api-usage
+# use IMAGEDATETIME in digital camera file names
+
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(glue)
+library(lubridate)
+
+base_url <- 'http://data.neonscience.org/api/v0/'
+# hs_data_id <- 'DP3.30010.001'
+data_id <- 'DP1.30010.001' # digital camera 10cm imagery
+
+req_aop <- GET(glue('{base_url}/products/{data_id}'))
+avail_aop <- content(req_aop, as = 'text') %>% 
+  fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+
+# List of products by site code with month
+# eg ABBY/2017-06
+data_urls_list <- avail_aop$data$siteCodes$availableDataUrls
+data_urls <- data_urls_list %>% unlist()
+
+# make this into a table
+avail_df <- data_urls_list %>%
+  purrr::map(~str_sub(.x, 56, 67)) %>%
+  unlist() %>% as.data.frame() %>%
+  mutate(siteid = str_sub(., 1, 4)) %>%
+  mutate(month = str_sub(., 6, 12)) %>%
+  dplyr::select(siteid, month)
+
+# actual files available
+data_files_req <- GET(data_urls[1])
+data_files <- content(data_files_req, as = "text") %>% fromJSON()
+
+data_files$data$month
+data_files$data$files$name[1]
+#  Digital camera: FLHTSTRT_EHCCCCCC(IMAGEDATETIME)-NNNN_ort.tif
+# IMAGEDATETIME: Date and time of image capture, YYYYMMDDHHmmSS
+
+# filter to just the tifs
+imgs <- data_files$data$files$name %>% fs::path_filter("*ort.tif")
+# extract image dates from parenthesis
+img_datetimes <- imgs %>% 
+  str_match_all("(?<=\\().+?(?=\\))") %>% 
+  unlist() %>% sort() %>% lubridate::as_datetime()
+
+img_datetimes %>% range()
