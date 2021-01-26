@@ -31,11 +31,10 @@ avail_df <- data_urls_list %>%
   mutate(month = str_sub(., 6, 12)) %>%
   dplyr::select(siteid, month)
 
-my_url <- data_urls[180]
+my_url <- data_urls[1]
 # actual files available
 get_img_datetimes <- function(my_url){
   data_files_req <- GET(my_url)
-  content(data_files_req)
   data_files <- content(data_files_req, as = "text") %>% fromJSON()
   # filter to just the tifs
   imgs <- data_files$data$files$name %>% fs::path_filter("*ort.tif")
@@ -50,8 +49,12 @@ get_img_datetimes <- function(my_url){
              last_img = tail(img_datetimes, 1))
   return(meta)
 }
+get_img_datetimes(data_urls[13])
 
-aop_meta_df <- data_urls %>% purrr::map_df(~get_img_datetimes(.x))
+poss_get_img_datetimes <- purrr::possibly(get_img_datetimes, otherwise = NULL)
+aop_meta_df <- data_urls %>% purrr::map_df(~poss_get_img_datetimes(.x))
+
+aop_meta_df %>% write_csv('results/aop_meta_df.csv')
 # data_files_req <- GET(data_urls[1])
 # data_files <- content(data_files_req, as = "text") %>% fromJSON()
 # 
