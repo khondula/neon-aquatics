@@ -4,7 +4,8 @@
 
 * `01-download-data.R` downloads shapefiles for aop boxes, domains, reaches, watersheds,
 unzips and organizes sw chem data by site
-* `02-chem-locations.R` 
+* `02-chem-locations.R` save shapefile of coordinates for sampling locations
+* `03-aop-dates.R` get image datetimes using neon api
 
 ## notes 
 
