@@ -39,5 +39,3 @@ tss_df %>% write_csv('results/tss_all.csv')
 
 # chlorophyll a data from... 
                                         
-
-head(doc_df)

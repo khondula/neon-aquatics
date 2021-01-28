@@ -52,5 +52,13 @@ sites_x_aop <- sites_sf %>% st_join(aop_boxes_unique, left = TRUE)
 sites_x_aop %>% write_csv('results/sites_x_aop.csv')
 # BLUE has 2 overlapping flight boxes, one small one big
 # REDB AOS S2 location has 2 overlapping points
+# WOOD-DCFS is just WOOD in flight dates
+# KONA-KONZ is just KONZ in flight dates
+# update table to have flightbox IDs
 
+sites_x_aop <- read_csv('results/sites_x_aop.csv') %>%
+  dplyr::select(domanID, siteID, namedLocation, domainName, flightbxID) %>%
+  mutate(aop_site_id = substr(flightbxID, 5, 8))
+
+sites_x_aop %>% write_csv('results/sites_x_aop.csv')
 

@@ -9,6 +9,19 @@ library(jsonlite)
 library(glue)
 library(lubridate)
 
+## table of flight dates
+aop_dates <- read_csv('~/Documents/data/NEON/meta/flight.dates.AOP.csv')
+aop_dates <- aop_dates %>% 
+  mutate(year = substr(YearSiteVisit, 1, 4),
+         siteid = substr(YearSiteVisit, 6, 9),
+         flightdate = ymd(substr(FlightDate, 1, 8)))
+aop_dates %>% write_csv('results/all_aop_dates.csv')
+
+
+
+# aquatic to aop sites
+
+### Or from API ###
 base_url <- 'http://data.neonscience.org/api/v0/'
 # hs_data_id <- 'DP3.30010.001'
 data_id <- 'DP1.30010.001' # digital camera 10cm imagery
