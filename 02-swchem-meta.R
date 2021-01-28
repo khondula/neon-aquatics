@@ -60,5 +60,8 @@ sites_x_aop <- read_csv('results/sites_x_aop.csv') %>%
   dplyr::select(domanID, siteID, namedLocation, domainName, flightbxID) %>%
   mutate(aop_site_id = substr(flightbxID, 5, 8))
 
-sites_x_aop %>% write_csv('results/sites_x_aop.csv')
+# separate type of aos site
+sites_x_aop <- sites_x_aop %>%
+  mutate(sitetype = substr(namedLocation, 10, nchar(namedLocation)))
 
+sites_x_aop %>% write_csv('results/sites_x_aop.csv')

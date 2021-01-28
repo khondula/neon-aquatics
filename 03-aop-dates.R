@@ -17,7 +17,7 @@ aop_dates <- aop_dates %>%
          flightdate = ymd(substr(FlightDate, 1, 8)))
 aop_dates %>% write_csv('results/all_aop_dates.csv')
 
-
+sites_join_aop_dates <- sites_x_aop %>% left_join(aop_dates, by = c("aop_site_id" = "siteid"))
 
 # aquatic to aop sites
 

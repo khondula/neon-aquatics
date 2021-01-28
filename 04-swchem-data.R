@@ -38,4 +38,16 @@ doc_df %>% write_csv('results/doc_all.csv')
 tss_df %>% write_csv('results/tss_all.csv')
 
 # chlorophyll a data from... 
-                                        
+  
+# how many samples per named location?
+doc_summary <- doc_df %>% 
+  group_by(siteID, namedLocation) %>% 
+  dplyr::filter(!is.na(analyteConcentration)) %>%
+  summarise(n_doc = n(), 
+            min_date = as_date(min(collectDate)),
+            max_date = as_date(max(collectDate)),
+            median_doc_mgL = median(analyteConcentration),
+            min_doc_mgL = min(analyteConcentration),
+            max_doc_mgL = max(analyteConcentration)) 
+
+doc_summary %>% write_csv('results/doc-overview')
