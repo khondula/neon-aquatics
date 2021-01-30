@@ -14,5 +14,19 @@ data_dir <- '~/Box/data/NEON/spatial'
 wq_dir <- '~/Box/data/NEON/NEON_water-qualityty'
 siteid <- 'COMO'
 
-fs::dir_ls(glue('{wq_dir}/{siteid}'), glob = "*sensor_positions*", recurse = 1) %>% 
-  purrr::map_df(~read_csv(.x))
+# get all sensor positions for a site
+
+coords_df <- glue('{wq_dir}/{siteid}') %>%
+  fs::dir_ls(glob = "*sensor_positions*", recurse = 1) %>% 
+  purrr::map_dfr(~read_csv(.x, col_types = c("dccTlccTlddddddddd"))) %>%
+  dplyr::select(name, description, xOffset, yOffset, zOffset, 
+                referenceLatitude, referenceLongitude, referenceElevation)
+
+head(coords_df)
+
+## TODO: function to get sensor positions for all aq sites ##
+# assume all lats and long in crs 4326?
+# what units are offset in? 
+
+sites_sf <- coords_df %>% sf::st_as_sf(coords = c("referenceLongitude", "referenceLatitude"), crs = 4326)
+# sites_sf %>% leaflet() %>% addTiles() %>% addMarkers(popup = ~description)

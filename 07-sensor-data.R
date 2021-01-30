@@ -10,15 +10,17 @@ library(lubridate)
 wq_dir <- '~/Box/data/NEON/NEON_water-quality'
 siteid <- 'COMO'
 
-# sensor position metadata
-# get_swchem_sites <- function(siteid){
-  coords <- fs::dir_ls(glue('{wq_dir}/{siteid}'), glob = "*sensor_positions*") %>% 
-    purrr::map_df(~read_csv(.x)) %>% 
-    dplyr::select(domainID, siteID, namedLocation, decimalLatitude, decimalLongitude, geodeticDatum) %>%
-    distinct()
-  # return(coords)
-# }
-# library(neonUtilities)
+# pull in data for one site (COMO)
+# AFTER moved all files to folder in 01
+
+wq_coltypes <- "TTddiddiddiddiddiddiddidddii"
+wq_df <- glue('{wq_dir}/{siteid}') %>%
+  fs::dir_ls(glob = "*waq_instantaneous*") %>% 
+  # head(20) %>%
+  purrr::map_dfr(~read_csv(.x, col_types = wq_coltypes)) %>%
+  dplyr::filter(!is.na(fDOM))
+
+
 # 
 # base_url <- 'http://data.neonscience.org/api/v0/'
 # data_id <- 'DP1.20288.001' # water quality
