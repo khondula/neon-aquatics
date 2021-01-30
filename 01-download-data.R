@@ -46,3 +46,17 @@ unzip_by_site <- function(siteid){
 }
 
 aq_site_ids %>% purrr::walk(~unzip_by_site(.x))
+
+# water quality sensor data
+# downloaded everything for COMO to test
+wq_dir <- '~/Box/data/NEON/NEON_water-quality'
+siteid <- 'COMO'
+
+# move all data from a site into one folder with site name
+mydirs <- fs::dir_ls(wq_dir, glob = glue('*{siteid}*'))
+myfiles <- fs::dir_ls(mydirs, recurse = 1)
+fs::dir_create(glue('{wq_dir}/{siteid}'))
+myfiles_new <- myfiles %>% map_chr(~glue('{wq_dir}/{siteid}/{basename(.x)}'))
+purrr::walk2(.x = myfiles, .y = myfiles_new, ~fs::file_move(.x, .y))
+fs::dir_delete(mydirs)
+
