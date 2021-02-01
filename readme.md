@@ -1,12 +1,16 @@
-# readme
+# neon-aquatics
+
+Repository for getting and organizing surface water chemistry and water quality data and where it was collected. 
 
 ## files
 
-* `01-download-data.R` - downloads shapefiles for aop boxes, domains, reaches, watersheds,
-unzips and organizes sw chem data by site
+* `01-download-data.R` - downloads shapefiles for aop boxes, domains, reaches, watersheds, unzips and organizes sw chem data by site
 * `02-swchem-meta.R` - save shapefile of coordinates for sampling locations
 * `03-aop-dates.R` - get image datetimes using neon api
 * `04-swchem-data.R` - pull all values 
+* `05-plots-swchem.R` - makes doc-timeseries.png, doc-x-site.png, tss-x-site.png
+* `06-sensor-meta.R` - get locations of sensor positions
+* `07-sensor-data.R` - get sensor time series data. 
 
 ## notes 
 
@@ -26,4 +30,10 @@ notes from [geoNEON](https://github.com/NEONScience/NEON-geolocation/tree/master
 * image date time should be between parentheses but not consistent
 * Digital camera: FLHTSTRT_EHCCCCCC(IMAGEDATETIME)-NNNN_ort.tif
 * IMAGEDATETIME: Date and time of image capture, YYYYMMDDHHmmSS
-parse datetime with lubridate? 
+
+## Water quality sensors
+
+* only downstream sensor (S2) has fDOM
+* both have SC, DO, pH, chl, turbidity
+
+

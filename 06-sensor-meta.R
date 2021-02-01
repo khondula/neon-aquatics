@@ -19,8 +19,9 @@ siteid <- 'COMO'
 coords_df <- glue('{wq_dir}/{siteid}') %>%
   fs::dir_ls(glob = "*sensor_positions*", recurse = 1) %>% 
   purrr::map_dfr(~read_csv(.x, col_types = c("dccTlccTlddddddddd"))) %>%
-  dplyr::select(name, description, xOffset, yOffset, zOffset, 
-                referenceLatitude, referenceLongitude, referenceElevation)
+  dplyr::select(HOR.VER, name, description, xOffset, yOffset, zOffset, 
+                referenceLatitude, referenceLongitude, referenceElevation) %>%
+  distinct()
 
 head(coords_df)
 
