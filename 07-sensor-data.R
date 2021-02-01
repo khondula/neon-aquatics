@@ -16,11 +16,11 @@ siteid <- 'COMO'
 wq_coltypes <- "TTddiddiddiddiddiddiddidddii"
 wq_df <- glue('{wq_dir}/{siteid}') %>%
   fs::dir_ls(glob = "*waq_instantaneous*") %>% 
-  # head(20) %>%
-  purrr::map_dfr(~read_csv(.x, col_types = wq_coltypes)) %>%
+  purrr::map_dfr(~read_csv(.x, col_types = wq_coltypes), .id = 'filename') %>%
   dplyr::filter(!is.na(fDOM))
 
-
+wq_df %>%
+  ggplot(aes(x = startDateTime, y = fDOM))
 # 
 # base_url <- 'http://data.neonscience.org/api/v0/'
 # data_id <- 'DP1.20288.001' # water quality
