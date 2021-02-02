@@ -11,10 +11,11 @@ data_dir <- '~/Box/data/NEON/spatial'
 #                   c("Relocatable Aquatic", "Core Aquatic")) %>% 
 #   pull(field_site_id)
 
-wq_dir <- '~/Box/data/NEON/NEON_water-qualityty'
+wq_dir <- '~/Box/data/NEON/NEON_water-quality'
 siteid <- 'COMO'
 
 # get all sensor positions for a site
+# woops deleted this folder
 
 coords_df <- glue('{wq_dir}/{siteid}') %>%
   fs::dir_ls(glob = "*sensor_positions*", recurse = 1) %>% 

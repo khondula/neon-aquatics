@@ -10,7 +10,7 @@ Repository for getting and organizing surface water chemistry and water quality 
 * `04-swchem-data.R` - pull all values 
 * `05-plots-swchem.R` - makes doc-timeseries.png, doc-x-site.png, tss-x-site.png
 * `06-sensor-meta.R` - get locations of sensor positions
-* `07-sensor-data.R` - get sensor time series data. 
+* `07-sensor-data.R` - get sensor time series data. rearrange into separate files for each sensor and wq parameter. 
 
 ## notes 
 

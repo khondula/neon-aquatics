@@ -71,15 +71,13 @@ rearrange_sensor_data <- function(wq_dir, siteid){
   }
   
   names(wq_params) %>% purrr::walk(~save_sensor_wq_timeseries(.x))
-  
+  # delete files for site
+  fs::dir_delete(glue('{wq_dir}/{siteid}'))
 }
 
 
-rearrange_sensor_data(wq_dir = "~/Box/data/NEON/NEON_water-quality 2", "ARIK")
-
-
-
-
+rearrange_sensor_data(wq_dir = "~/Box/data/NEON/NEON_water-quality", "BIGC")
+rearrange_sensor_data(wq_dir = "~/Box/data/NEON/NEON_water-quality", "BARC")
 
 
 # wq_df %>%
