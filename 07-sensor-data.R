@@ -4,83 +4,73 @@ library(httr)
 library(jsonlite)
 library(glue)
 # library(lubridate)
-# library(vroom)
+library(vroom)
+
+wq_dir <- '~/Box/data/NEON/NEON_water-quality'
+ts_dir <- '~/Box/data/NEON/wq-timeseries'
 
 # try using Api to get IS water quality data
 base_url <- 'http://data.neonscience.org/api/v0/'
 data_id <- 'DP1.20288.001' # water quality
+aq_site_ids <- read_lines('aq_site_ids.txt')
+mysite <- aq_site_ids[1]
 
-req_avail <- GET(glue('{base_url}/products/{data_id}'))
-avail_resp <- content(req_avail, as = 'text') %>% 
-  fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
-
-# List of products by site code with month
-# eg ARIK/2016-03
-data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
-# names(data_urls_list) <- avail_resp$data$siteCodes$siteCode
-# data_urls <- data_urls_list %>% unlist()
-
-# make this into a table
-avail_df <- data_urls_list %>%
-  unlist() %>% as.data.frame() %>%
-  dplyr::rename(url = 1) %>%
-  mutate(siteid = str_sub(url, 56, 59)) %>%
-  mutate(month = str_sub(url, 61, 67)) %>%
-  dplyr::select(siteid, month, url)
-
-my_url <- avail_df$url[100]
-# actual files available
-# get_img_datetimes <- function(my_url){
-  data_files_req <- GET(my_url)
-  data_files <- content(data_files_req, as = "text") %>% fromJSON()
-  # filter to just the waq_instantaneous basic files
-  # future enhancement: check md5 sums for changes! 
-  wq_files <- data_files$data$files$name %>% 
-    fs::path_filter(regexp = "(waq_instantaneous).*(basic)")
-  # extract image dates from parenthesis
-  img_datetimes <- imgs %>% 
-    str_match_all("(?<=\\().+?(?=\\))") %>% 
-    unlist() %>% sort() %>% lubridate::as_datetime()
-  # one row data frame of results
-  meta <- data.frame(siteid = data_files$data$siteCode,
-                     month = data_files$data$month,
-                     first_img = head(img_datetimes, 1),
-                     last_img = tail(img_datetimes, 1))
-  return(meta)
-}
-get_img_datetimes(data_urls[13])
-
-poss_get_img_datetimes <- purrr::possibly(get_img_datetimes, otherwise = NULL)
-aop_meta_df <- data_urls %>% purrr::map_df(~poss_get_img_datetimes(.x))
-
-
-
-# test out with COMO data
-wq_dir <- '~/Box/data/NEON/NEON_water-quality'
-ts_dir <- '~/Box/data/NEON/wq-timeseries'
-# pull in data for one site (COMO)
-# AFTER moved all files to folder in 01
-
-# water quality sensor data
-# downloaded everything for one site to test
-wq_dir <- '~/Box/data/NEON/NEON_water-quality 2'
-siteid <- 'ARIK'
-
-# first move all data from a site into one folder with site name
-
-rearrange_sensor_data <- function(wq_dir, siteid){
-  # rearrange downloaded files into one directory
-  mydirs <- fs::dir_ls(wq_dir, glob = glue('*{siteid}*'))
-  myfiles <- fs::dir_ls(mydirs, recurse = 1)
-  fs::dir_create(glue('{wq_dir}/{siteid}'))
-  myfiles_new <- myfiles %>% map_chr(~glue('{wq_dir}/{siteid}/{basename(.x)}'))
-  purrr::walk2(.x = myfiles, .y = myfiles_new, ~fs::file_move(.x, .y))
-  fs::dir_delete(mydirs)
+download_site_wq <- function(mysite){
+  base_url <- 'http://data.neonscience.org/api/v0/'
+  data_id <- 'DP1.20288.001' # water quality
+  req_avail <- GET(glue('{base_url}/products/{data_id}'))
+  avail_resp <- content(req_avail, as = 'text') %>% 
+    fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
   
-  # then read all files in together
+  # List of products by site code with month
+  data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
+  # make table of urls with site and months
+  avail_df <- data_urls_list %>%
+    unlist() %>% as.data.frame() %>%
+    dplyr::rename(url = 1) %>%
+    mutate(siteid = str_sub(url, 56, 59)) %>%
+    mutate(month = str_sub(url, 61, 67)) %>%
+    dplyr::select(siteid, month, url)
+  
+  my_site_urls <- avail_df %>% 
+    dplyr::filter(siteid == mysite) %>%
+    # add line here to filter for filter dates after what is already downloaded?
+    pull(url)
+  
+  # filter to just the waq_instantaneous basic files
+  get_waq_files <- function(my_url){
+    data_files_req <- GET(my_url)
+    data_files <- content(data_files_req, as = "text") %>% fromJSON()
+    # future enhancement: check md5 sums for changes! 
+    # compare to existing files!
+    wq_files <- data_files$data$files$name %>% 
+      fs::path_filter(regexp = "(waq_instantaneous).*(basic)")
+    ids <- wq_files %>% purrr::map_int(~grep(.x, data_files$data$files$name))
+    wq_files_urls <- data_files$data$files$url[ids]
+    return(list(files = wq_files, urls = wq_files_urls))
+  }
+  
+  my_files_list <- my_site_urls %>% purrr::map(~get_waq_files(.x))
+  
+  # download!
+  fs::dir_create(glue('{wq_dir}/{mysite}'))
+  # for each object in list my_files (each month-year)
+  # download each of the files to local file
+  
+  download_month <- function(my_files){
+    my_files_local <- glue('{wq_dir}/{mysite}/{my_files$files}')
+    purrr::walk2(.x = my_files$urls, .y = my_files_local, ~download.file(.x, .y))
+  }
+  my_files_list %>% purrr::walk(~download_month(.x))
+  
+}
+
+
+rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-quality'){
+  # read all files in together
   wq_coltypes <- "TTddiddiddiddiddiddiddidddii"
-  wq_df <- glue('{wq_dir}/{siteid}') %>%
-    fs::dir_ls(glob = "*waq_instantaneous*") %>% 
+  wq_df <- glue('{wq_dir}/{mysite}') %>%
+    fs::dir_ls(glob = "*waq_instantaneous*") %>% # shouldnt need this row
     purrr::map_dfr(~read_csv(.x, col_types = wq_coltypes), .id = 'filename') %>%
     dplyr::mutate(filename = basename(filename)) %>% 
     dplyr::mutate(siteid = substr(filename, 10, 13),
@@ -98,6 +88,7 @@ rearrange_sensor_data <- function(wq_dir, siteid){
   
   #  then save separate CSV for each parameter and sensor
   # need to have wq_df, wq_params, ts_dir, siteid
+  ts_dir <- '~/Box/data/NEON/wq-timeseries'
   save_sensor_wq_timeseries <- function(wq_param){
     # list of parameter data for each sensor
     wq_par_list <- wq_df %>% 
@@ -110,48 +101,20 @@ rearrange_sensor_data <- function(wq_dir, siteid){
       purrr::map_chr(~unique(pull(.x, sensor_position)))
     names(wq_par_list) <- sensorids
     # make directory and save files
-    site_ts_dir <- glue('{ts_dir}/{siteid}')
+    site_ts_dir <- glue('{ts_dir}/{mysite}')
     fs::dir_create(site_ts_dir)
-    filenames <- glue('{site_ts_dir}/{siteid}_{wq_param}_sensor{sensorids}.csv')
+    filenames <- glue('{site_ts_dir}/{mysite}_{wq_param}_sensor{sensorids}.csv')
     wq_par_list %>% 
       purrr::walk2(.y = filenames, ~vroom_write(.x, .y, delim = ","))
     wq_par_list %>% purrr::map(~nrow(.x))
   }
   
   names(wq_params) %>% purrr::walk(~save_sensor_wq_timeseries(.x))
-  # delete files for site
-  fs::dir_delete(glue('{wq_dir}/{siteid}'))
 }
 
 
-rearrange_sensor_data(wq_dir = "~/Box/data/NEON/NEON_water-quality", "BIGC")
-rearrange_sensor_data(wq_dir = "~/Box/data/NEON/NEON_water-quality", "BARC")
+download_site_wq(mysite = aq_site_ids[3])
 
-
-# wq_df %>%
-#   ggplot(aes(x = startDateTime, y = fDOM))
-# 
-# base_url <- 'http://data.neonscience.org/api/v0/'
-# data_id <- 'DP1.20288.001' # water quality
-# 
-# req_data_product <- GET(glue('{base_url}/products/{data_id}'))
-# avail_data <- content(req_data_product, as = 'text') %>% 
-#   fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
-# 
-# # List of products by site code with month
-# # eg ABBY/2017-06
-# data_urls_list <- avail_data$data$siteCodes$availableDataUrls
-# data_urls <- data_urls_list %>% unlist()
-# 
-# head(data_urls)
-# 
-# my_url <- data_urls[1]
-# # get all of the water quality data for one aquatic site
-# # # actual files available
-# data_files_req <- GET(my_url)
-# data_files <- content(data_files_req, as = "text") %>% fromJSON()
-# data_files$data$files$name
-# 
-# imgs <- data_files$data$files$name
-
-
+rearrange_sensor_data("HOPB")
+rearrange_sensor_data("LEWI")
+rearrange_sensor_data("POSE")
