@@ -74,7 +74,9 @@ ggsave('figs/como-fdom.png')
 fdom_daily_df <- fdom_df %>%
   dplyr::filter(date %in% sample_dates) %>%
   group_by(siteid, sensor_position, date) %>%
-  summarise(median_fDOM = median(fDOM))
+  summarise(median_fDOM = median(fDOM),
+            sd_fDOM = sd(fDOM),
+            se_fDOM = sd_fDOM/n())
 
 # JOIN!! #
 doc_x_fdom <- doc_df %>% 
@@ -82,6 +84,8 @@ doc_x_fdom <- doc_df %>%
   
 doc_x_fdom %>% 
   ggplot(aes(x = analyteConcentration, y = median_fDOM)) +
+  geom_errorbar(aes(ymin = median_fDOM - sd_fDOM, 
+                    ymax = median_fDOM + sd_fDOM)) +
   geom_point() +
   xlab("DOC (mg/L)") +
   # ylab("fDOM")
@@ -90,3 +94,9 @@ doc_x_fdom %>%
   ggtitle(glue('{siteid} - sensor vs grab'))
 
 ggsave('figs/como-comparetest.png')
+
+# do this for all the aquatic sites
+
+# and then also for TSS vs turbidity
+# and for chl vs chl a samples? 
+# then see how good the models are and how much they vary by site
