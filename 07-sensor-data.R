@@ -1,11 +1,59 @@
-# use neon api to get sensor data
-# water quality
+# Get water quality
 library(tidyverse)
-# library(httr)
-# library(jsonlite)
+library(httr)
+library(jsonlite)
 library(glue)
-library(lubridate)
-library(vroom)
+# library(lubridate)
+# library(vroom)
+
+# try using Api to get IS water quality data
+base_url <- 'http://data.neonscience.org/api/v0/'
+data_id <- 'DP1.20288.001' # water quality
+
+req_avail <- GET(glue('{base_url}/products/{data_id}'))
+avail_resp <- content(req_avail, as = 'text') %>% 
+  fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+
+# List of products by site code with month
+# eg ARIK/2016-03
+data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
+# names(data_urls_list) <- avail_resp$data$siteCodes$siteCode
+# data_urls <- data_urls_list %>% unlist()
+
+# make this into a table
+avail_df <- data_urls_list %>%
+  unlist() %>% as.data.frame() %>%
+  dplyr::rename(url = 1) %>%
+  mutate(siteid = str_sub(url, 56, 59)) %>%
+  mutate(month = str_sub(url, 61, 67)) %>%
+  dplyr::select(siteid, month, url)
+
+my_url <- avail_df$url[100]
+# actual files available
+# get_img_datetimes <- function(my_url){
+  data_files_req <- GET(my_url)
+  data_files <- content(data_files_req, as = "text") %>% fromJSON()
+  # filter to just the waq_instantaneous basic files
+  # future enhancement: check md5 sums for changes! 
+  wq_files <- data_files$data$files$name %>% 
+    fs::path_filter(regexp = "(waq_instantaneous).*(basic)")
+  # extract image dates from parenthesis
+  img_datetimes <- imgs %>% 
+    str_match_all("(?<=\\().+?(?=\\))") %>% 
+    unlist() %>% sort() %>% lubridate::as_datetime()
+  # one row data frame of results
+  meta <- data.frame(siteid = data_files$data$siteCode,
+                     month = data_files$data$month,
+                     first_img = head(img_datetimes, 1),
+                     last_img = tail(img_datetimes, 1))
+  return(meta)
+}
+get_img_datetimes(data_urls[13])
+
+poss_get_img_datetimes <- purrr::possibly(get_img_datetimes, otherwise = NULL)
+aop_meta_df <- data_urls %>% purrr::map_df(~poss_get_img_datetimes(.x))
+
+
 
 # test out with COMO data
 wq_dir <- '~/Box/data/NEON/NEON_water-quality'
