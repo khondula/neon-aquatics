@@ -61,7 +61,32 @@ fdom_df %>%
   theme_minimal() +
   expand_limits(y = 0) +
   xlab("UTC time") +
-  ggtitle(glue('{siteid} fDOM on grab sample days'))
+  ggtitle(glue('{siteid} - fDOM on grab sample days'))
 # figure out a better color palette, facet by year and color by date?
+ggsave('figs/como-fdom.png')
+# facet plot with vertical lines for time of grab sample collection
+# and once time of AOP overpass is determined, facet plot with vertical lines 
 
-# once time of AOP overpass is determined, facet plot with vertical lines 
+# NOT CONVERTED TO LOCAL TIME, but for now... 
+# average (median) of day
+# might want to know how much of the day is represented by each value
+# and how variable that day is... 
+fdom_daily_df <- fdom_df %>%
+  dplyr::filter(date %in% sample_dates) %>%
+  group_by(siteid, sensor_position, date) %>%
+  summarise(median_fDOM = median(fDOM))
+
+# JOIN!! #
+doc_x_fdom <- doc_df %>% 
+  left_join(fdom_daily_df, by = c("siteID" = "siteid", "date"))
+  
+doc_x_fdom %>% 
+  ggplot(aes(x = analyteConcentration, y = median_fDOM)) +
+  geom_point() +
+  xlab("DOC (mg/L)") +
+  # ylab("fDOM")
+  theme_minimal() +
+  expand_limits(x = 0, y = 0) +
+  ggtitle(glue('{siteid} - sensor vs grab'))
+
+ggsave('figs/como-comparetest.png')
