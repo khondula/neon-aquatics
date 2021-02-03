@@ -10,8 +10,8 @@ wq_dir <- '~/Box/data/NEON/NEON_water-quality'
 ts_dir <- '~/Box/data/NEON/wq-timeseries'
 
 # try using Api to get IS water quality data
-base_url <- 'http://data.neonscience.org/api/v0/'
-data_id <- 'DP1.20288.001' # water quality
+# base_url <- 'http://data.neonscience.org/api/v0/'
+# data_id <- 'DP1.20288.001' # water quality
 aq_site_ids <- read_lines('aq_site_ids.txt')
 mysite <- aq_site_ids[1]
 
@@ -73,7 +73,7 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
     purrr::map_dfr(~read_csv(.x, col_types = wq_coltypes), .id = 'filename') %>%
     dplyr::mutate(filename = basename(filename)) %>% 
     dplyr::mutate(siteid = substr(filename, 10, 13),
-                  sensor_position = substr(filename, 29, 33))
+                  sensor_position = substr(filename, 29, 31))
   
   # then save separate time series for each sensor
   # SC, DO, DOsat, pH, chl, turb, fDOM
@@ -112,4 +112,9 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
   names(wq_params) %>% purrr::walk(~save_sensor_wq_timeseries(.x))
 }
 
+# computer says please dont do all at the same time 
+# download_site_wq("BARC")
+
+# rearrange_sensor_data(mysite)
+aq_site_ids[2:34] %>% purrr::walk(~rearrange_sensor_data(.x))
 
