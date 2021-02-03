@@ -3,7 +3,7 @@ library(tidyverse)
 library(httr)
 library(jsonlite)
 library(glue)
-# library(lubridate)
+library(lubridate)
 library(vroom)
 
 wq_dir <- '~/Box/data/NEON/NEON_water-quality'
@@ -112,9 +112,43 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
   names(wq_params) %>% purrr::walk(~save_sensor_wq_timeseries(.x))
 }
 
+aq_site_ids
 
-download_site_wq(mysite = aq_site_ids[3])
+download_site_wq(mysite = "SYCA")
+rearrange_sensor_data("SYCA")
 
-rearrange_sensor_data("HOPB")
-rearrange_sensor_data("LEWI")
-rearrange_sensor_data("POSE")
+download_site_wq(mysite = "CUPE")
+rearrange_sensor_data("CUPE")
+
+download_site_wq(mysite = "GUIL")
+rearrange_sensor_data("GUIL")
+
+download_site_wq(mysite = "KING")
+rearrange_sensor_data("KING")
+
+download_site_wq(mysite = "MCDI")
+rearrange_sensor_data("MCDI")
+
+download_site_wq(mysite = "LECO")
+rearrange_sensor_data("LECO")
+
+download_site_wq(mysite = "WALK")
+rearrange_sensor_data("WALK")
+
+download_site_wq(mysite = "MAYF")
+rearrange_sensor_data("MAYF")
+
+download_site_wq(mysite = "BLUE")
+rearrange_sensor_data("BLUE")
+
+download_site_wq(mysite = "PRIN")
+rearrange_sensor_data("PRIN")
+
+download_site_wq(mysite = "BLDE")
+rearrange_sensor_data("BLDE")
+
+download_site_wq(mysite = "WLOU")
+rearrange_sensor_data("WLOU")
+
+download_site_wq(mysite = "REDB")
+rearrange_sensor_data("REDB")
