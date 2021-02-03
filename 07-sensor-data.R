@@ -40,14 +40,13 @@ download_site_wq <- function(mysite){
   # filter to just the waq_instantaneous basic files
   get_waq_files <- function(my_url){
     data_files_req <- GET(my_url)
-    data_files <- content(data_files_req, as = "text") %>% fromJSON()
+    data_files <- content(data_files_req, as = "text") %>%
+      fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+    data_files_df <- data_files$data$files %>% 
+      filter(str_detect(name, "(waq_instantaneous).*(basic)"))
     # future enhancement: check md5 sums for changes! 
     # compare to existing files!
-    wq_files <- data_files$data$files$name %>% 
-      fs::path_filter(regexp = "(waq_instantaneous).*(basic)")
-    ids <- wq_files %>% purrr::map_int(~grep(.x, data_files$data$files$name))
-    wq_files_urls <- data_files$data$files$url[ids]
-    return(list(files = wq_files, urls = wq_files_urls))
+    return(list(files = data_files_df$name, urls = data_files_df$url))
   }
   
   my_files_list <- my_site_urls %>% purrr::map(~get_waq_files(.x))
@@ -112,47 +111,5 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
   
   names(wq_params) %>% purrr::walk(~save_sensor_wq_timeseries(.x))
 }
-
-
-# non stream sites! these should work but the join thing doesnt
-# maybe should update above function first. 
-download_site_wq(mysite = "BARC")
-rearrange_sensor_data("BARC")
-
-download_site_wq(mysite = "SUGG")
-rearrange_sensor_data("SUGG")
-
-download_site_wq(mysite = "CRAM")
-rearrange_sensor_data("CRAM")
-
-download_site_wq(mysite = "LIRO")
-rearrange_sensor_data("LIRO")
-
-download_site_wq(mysite = "BLWA")
-rearrange_sensor_data("BLWA")
-
-download_site_wq(mysite = "TOMB")
-rearrange_sensor_data("TOMB")
-
-download_site_wq(mysite = "PRLA")
-rearrange_sensor_data("PRLA")
-
-download_site_wq(mysite = "PRPO")
-rearrange_sensor_data("PRPO")
-
-download_site_wq(mysite = "TOOK")
-rearrange_sensor_data("TOOK")
-
-
-
-
-
-
-
-
-
-
-
-
 
 

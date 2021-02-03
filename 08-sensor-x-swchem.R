@@ -14,7 +14,8 @@ mysite <- 'FLNT'
 
 join_doc_fdom <- function(mysite){
   # read in doc data for site
-  doc_df <- read_csv('results/doc_all.csv') %>%
+  doc_coltypes <- 'ccccTcdcc'
+  doc_df <- read_csv('results/doc_all.csv', col_types = doc_coltypes) %>%
     dplyr::filter(siteID == mysite) %>%
     mutate(date = lubridate::as_date(collectDate))
   
@@ -111,7 +112,7 @@ sites_to_join <- sites_w_ts[!sites_w_ts %in% doc_joined_sites]
 
 sites_to_join %>% purrr::walk(~poss_join_doc_fdom(.x))
 
-# poss_join_doc_fdom("MCDI")
+poss_join_doc_fdom("ARIK")
 # and then also for TSS vs turbidity
 # and for chl vs chl a samples? 
 # then see how good the models are and how much they vary by site
@@ -135,7 +136,22 @@ doc_x_fdom %>%
   facet_wrap(vars(siteID), scales = 'free') +
   theme(legend.position = 'none') +
   ggtitle(glue('fDOM vs DOC'))
-ggsave(glue('figs/fdom-x-doc.png'))
+ggsave(glue('figs/fdom-x-doc.png'), width = 8, height = 6)
+
+# NOT faceted
+doc_x_fdom %>% 
+  filter(!is.na(median_fDOM)) %>%
+  ggplot(aes(x = analyteConcentration, y = median_fDOM, color = siteID)) +
+  geom_smooth(method = 'lm', se = FALSE) +
+  geom_errorbar(aes(ymin = median_fDOM - sd_fDOM, 
+                    ymax = median_fDOM + sd_fDOM)) +
+  geom_point(pch = 21, aes(fill = siteID), col = 'black', alpha = 0.5) +
+  xlab("DOC (mg/L)") +
+  # ylab("fDOM")
+  theme_minimal() +
+  expand_limits(x = 0, y = 0) +
+  theme(legend.position = 'none') +
+  ggtitle(glue('fDOM vs DOC'))
 
 # now with doc as Y
 # doc_x_fdom %>% 

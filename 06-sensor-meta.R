@@ -2,20 +2,55 @@ library(tidyverse)
 library(fs)
 library(glue)
 library(sf)
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(vroom)
 
-data_dir <- '~/Box/data/NEON/spatial'
+positions_dir <- '~/Box/data/NEON/spatial/wq-sensor-positions'
+aq_site_ids <- read_lines('aq_site_ids.txt')
 
-# sites_df <- read_csv(glue('{data_dir}/field_sites.csv'))
-# aq_site_ids <- sites_df %>% 
-#   dplyr::filter(field_site_type %in% 
-#                   c("Relocatable Aquatic", "Core Aquatic")) %>% 
-#   pull(field_site_id)
+mysite <- 'FLNT'
 
-wq_dir <- '~/Box/data/NEON/NEON_water-quality'
-siteid <- 'COMO'
+# get all sensor positions for a site with API
 
-# get all sensor positions for a site
-# woops deleted this folder
+base_url <- 'http://data.neonscience.org/api/v0/'
+data_id <- 'DP1.20288.001' # water quality
+req_avail <- GET(glue('{base_url}/products/{data_id}'))
+avail_resp <- content(req_avail, as = 'text') %>% 
+  fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+
+# List of products by site code with month
+data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
+# make table of urls with site and months
+avail_df <- data_urls_list %>%
+  unlist() %>% as.data.frame() %>%
+  dplyr::rename(url = 1) %>%
+  mutate(siteid = str_sub(url, 56, 59)) %>%
+  mutate(month = str_sub(url, 61, 67)) %>%
+  dplyr::select(siteid, month, url)
+
+my_site_urls <- avail_df %>% 
+  dplyr::filter(siteid == mysite) %>%
+  # add line here to filter for filter dates after what is already downloaded?
+  pull(url)
+
+my_url <- my_site_urls[1]
+# filter to just the waq_instantaneous basic files
+get_positions_files <- function(my_url){
+  data_files_req <- GET(my_url)
+  data_files <- content(data_files_req, as = "text") %>%
+    fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+  data_files_df <- data_files$data$files %>% 
+    filter(str_detect(name, "sensor_positions"))
+  # future enhancement: check md5 sums for changes! 
+  # compare to existing files!
+  return(list(files = data_files_df$name, urls = data_files_df$url))
+}
+
+my_files_list <- my_site_urls %>% purrr::map(~get_positions_files(.x))
+
+##
 
 coords_df <- glue('{wq_dir}/{siteid}') %>%
   fs::dir_ls(glob = "*sensor_positions*", recurse = 1) %>% 
