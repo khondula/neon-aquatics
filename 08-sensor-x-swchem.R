@@ -105,9 +105,13 @@ join_doc_fdom <- function(mysite){
 
 # do this for all the aquatic sites... with data downloaded
 sites_w_ts <- fs::dir_ls(wq_dir) %>% basename()
+doc_joined_sites <- fs::dir_ls('results/doc-join-fdom') %>% basename() %>% str_sub(1, 4)
 poss_join_doc_fdom <- purrr::safely(join_doc_fdom, quiet = FALSE)
-sites_w_ts[2:5] %>% purrr::walk(~poss_join_doc_fdom(.x))
-poss_join_doc_fdom("CUPE")
+sites_to_join <- sites_w_ts[!sites_w_ts %in% doc_joined_sites]
+
+sites_to_join %>% purrr::walk(~poss_join_doc_fdom(.x))
+
+# poss_join_doc_fdom("MCDI")
 # and then also for TSS vs turbidity
 # and for chl vs chl a samples? 
 # then see how good the models are and how much they vary by site
@@ -132,3 +136,22 @@ doc_x_fdom %>%
   theme(legend.position = 'none') +
   ggtitle(glue('fDOM vs DOC'))
 ggsave(glue('figs/fdom-x-doc.png'))
+
+# now with doc as Y
+# doc_x_fdom %>% 
+#   filter(!is.na(median_fDOM)) %>%
+#   ggplot(aes(x = median_fDOM, y = analyteConcentration, color = siteID)) +
+#   geom_smooth(method = 'lm', se = FALSE) +
+#   geom_errorbarh(aes(xmin = median_fDOM - sd_fDOM, 
+#                     xmax = median_fDOM + sd_fDOM)) +
+#   geom_point(pch = 21, aes(fill = siteID), col = 'black') +
+#   ylab("DOC (mg/L)") +
+#   # ylab("fDOM")
+#   theme_minimal() +
+#   expand_limits(x = 0, y = 0) +
+#   facet_wrap(vars(siteID), scales = 'free') +
+#   theme(legend.position = 'none') +
+#   ggtitle(glue('fDOM vs DOC'))
+# 
+# ggsave(glue('figs/fdom-x-doc2.png'))
+
