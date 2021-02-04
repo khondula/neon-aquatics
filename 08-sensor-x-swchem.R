@@ -4,7 +4,7 @@ library(glue)
 library(lubridate)
 library(vroom)
 library(hms)
-
+library(data.table)
 # once surface water chem data and sensor data are acquired
 # compare sensor values and surface water chem
 # overall distribution AND for days of sw sampling
@@ -12,24 +12,40 @@ wq_dir <- '~/Box/data/NEON/NEON_water-quality'
 ts_dir <- '~/Box/data/NEON/wq-timeseries'
 mysite <- 'FLNT'
 
+
+# sensor positions with fDOM
+# make sure to have empty files removed in 07 
+fdom_positions <- fs::dir_ls(ts_dir, recurse = 1, regexp = 'fDOM') %>% 
+  basename() %>% as.data.frame() %>%
+  mutate(siteid = substr(., 1, 4),
+         sensor_position = substr(., 17, 19)) %>%
+  dplyr::select(siteid, sensor_position)
+fdom_positions %>% write_csv('results/fdom_positions.csv')
+
+  
 join_doc_fdom <- function(mysite){
+  fdom_positions_aos <- read_csv('results/fdom_positions_aos.csv') %>%
+    dplyr::filter(siteid == mysite)
   # read in doc data for site
   doc_coltypes <- 'ccccTcdcc'
   doc_df <- read_csv('results/doc_all.csv', col_types = doc_coltypes) %>%
     dplyr::filter(siteID == mysite) %>%
-    mutate(date = lubridate::as_date(collectDate))
-  
+    mutate(date = lubridate::as_date(collectDate)) %>%
+    left_join(fdom_positions_aos, 
+              by = c("siteID" = "siteid", "namedLocation")) %>%
+    mutate(time_hms = as_hms(collectDate))
+    
   # how many sites?
   # doc_df$namedLocation %>% unique()
   sample_dates <- doc_df$date %>% unique()
   message(glue('{length(sample_dates)} DOC sample dates at {mysite}'))
   # read in sensor data for fDOM for site
   fdom_df_all <- glue('{ts_dir}/{mysite}') %>% 
-    fs::dir_ls(glob = '*fDOM_sensor102*') %>%
+    fs::dir_ls(glob = '*fDOM*') %>%
     vroom::vroom() %>% 
     dplyr::filter(!is.na(fDOM)) %>%
     mutate(date = lubridate::as_date(startDateTime))
-  
+  # fdom_df_all$sensor_position %>% unique()
   # how much data is flagged?
   # table(fdom_df_all$fDOMFinalQF)
   # redo this with custom colors, lines
@@ -52,11 +68,14 @@ join_doc_fdom <- function(mysite){
   # get values on sampling dates, plot on density plot to see range sampled
   # figure out a better color palette, facet by year and color by date?
   # adjust to local time for site? 
+  doc_df_sub <- doc_df %>%
+    dplyr::filter(date %in% unique(fdom_df$date))
   p1 <- fdom_df %>%
     dplyr::filter(date %in% sample_dates) %>%
     mutate(time_hms = as_hms(startDateTime)) %>% 
     mutate(date = as.character(date)) %>%
     ggplot(aes(x = time_hms, y = fDOM, group = date)) +
+    geom_vline(data = doc_df_sub, aes(xintercept = time_hms), lty = 2) +
     geom_line(aes(col = date)) + 
     theme_minimal() +
     expand_limits(y = 0) +
@@ -64,7 +83,7 @@ join_doc_fdom <- function(mysite){
     ggtitle(glue('{mysite} - fDOM on DOC grab sample days')) +
     facet_wrap(vars(date)) +
     theme(legend.position = 'none')
-  # p1
+  p1
   ggsave(glue('figs/fdom/{mysite}-fdom.png'), p1, width = 6, height = 4)
   # facet plot with vertical lines for time of grab sample collection
   # and once time of AOP overpass is determined, facet plot with vertical lines 
@@ -171,3 +190,10 @@ doc_x_fdom %>%
 # 
 # ggsave(glue('figs/fdom-x-doc2.png'))
 
+# TURBIDITY
+
+fs::dir_ls(ts_dir, recurse = 1, regexp = 'turbidity') %>% 
+  basename() %>% as.data.frame() %>%
+  mutate(siteid = substr(., 1, 4),
+         sensor_position = substr(., 22, 24)) %>%
+  dplyr::select(siteid, sensor_position)
