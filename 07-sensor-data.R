@@ -69,7 +69,7 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
   # read all files in together
   wq_coltypes <- "TTddiddiddiddiddiddiddidddii"
   wq_df <- glue('{wq_dir}/{mysite}') %>%
-    fs::dir_ls(glob = "*waq_instantaneous*") %>% # shouldnt need this row
+    fs::dir_ls(glob = "*waq_instantaneous*") %>%
     purrr::map_dfr(~read_csv(.x, col_types = wq_coltypes), .id = 'filename') %>%
     dplyr::mutate(filename = basename(filename)) %>% 
     dplyr::mutate(siteid = substr(filename, 10, 13),
@@ -91,7 +91,7 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
   save_sensor_wq_timeseries <- function(wq_param){
     # list of parameter data for each sensor
     wq_par_list <- wq_df %>% 
-      filter(!is.na(wq_params[[wq_param]][1])) %>%
+      # filter(!is.na(wq_params[[wq_param]][1])) %>%
       dplyr::select(siteid, sensor_position, startDateTime, 
                     endDateTime, wq_params[[wq_param]]) %>%
       group_by(sensor_position) %>% group_split()
@@ -99,14 +99,13 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
     sensorids <- wq_par_list %>% 
       purrr::map_chr(~unique(pull(.x, sensor_position)))
     names(wq_par_list) <- sensorids
-    ## HERE -- check for any non NA values before saving ##
+    ## HERE -- check for any non NA values before saving? ##
     # make directory and save files
     site_ts_dir <- glue('{ts_dir}/{mysite}')
     fs::dir_create(site_ts_dir)
     filenames <- glue('{site_ts_dir}/{mysite}_{wq_param}_sensor{sensorids}.csv')
     wq_par_list %>% 
       purrr::walk2(.y = filenames, ~vroom_write(.x, .y, delim = ","))
-    wq_par_list %>% purrr::map(~nrow(.x))
   }
   
   names(wq_params) %>% purrr::walk(~save_sensor_wq_timeseries(.x))
@@ -115,6 +114,18 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
 # computer says please dont do all at the same time 
 # download_site_wq("BARC")
 
-# rearrange_sensor_data(mysite)
-aq_site_ids[2:34] %>% purrr::walk(~rearrange_sensor_data(.x))
+rearrange_sensor_data(aq_site_ids[30])
 
+# Remove files that have no non-NA values
+
+fDOM_files <- fs::dir_ls(ts_dir, recurse = 1, regexp = 'fDOM')
+
+check_fDOM_nrows <- function(wq_ts_file){
+  my_dt <- fread(wq_ts_file)
+  my_nrow <- nrow(my_dt[!is.na(fDOM)])
+  if(my_nrow<1){
+    fs::file_delete(wq_ts_file)
+    message(glue("No data in {basename(wq_ts_file)}, deleting"))}
+}
+
+fDOM_files %>% purrr::walk(~check_fDOM_nrows(.x))
