@@ -23,6 +23,17 @@ sites_join_aop_dates <- sites_x_aop %>% left_join(aop_dates, by = c("aop_site_id
 sites_join_aop_dates %>% write_csv('results/sites_join_aop_dates.csv')
 # aquatic to aop sites
 
+aop_dates <- read_csv('results/sites_join_aop_dates.csv')
+# siteID is the aquatic site
+get_aop_dates <- function(aq_siteids){
+  aop_dates <- read_csv('results/sites_join_aop_dates.csv') %>%
+    dplyr::filter(siteID %in% aq_siteids) %>%
+    dplyr::select(siteID, aop_site_id, flightdate) %>%
+    arrange(flightdate)
+  return(aop_dates)
+}
+get_aop_dates('LEWI')
+
 ### Or from API ###
 base_url <- 'http://data.neonscience.org/api/v0/'
 # hs_data_id <- 'DP3.30010.001'

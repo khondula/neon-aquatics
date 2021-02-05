@@ -6,8 +6,8 @@ library(lubridate)
 doc_df <- read_csv('results/doc_all.csv')
 
 doc_df %>%
-  mutate(siteID = fct_reorder(siteID, .x = analyteConcentration, .fun = median, na.rm = TRUE)) %>%
-  ggplot(aes(x = siteID, y = analyteConcentration)) +
+  mutate(namedLocation = fct_reorder(namedLocation, .x = analyteConcentration, .fun = median, na.rm = TRUE)) %>%
+  ggplot(aes(x = namedLocation, y = analyteConcentration)) +
   geom_boxplot() +
   theme_bw() +
   xlab(element_blank()) +

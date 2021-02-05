@@ -40,6 +40,10 @@ tss_df %>% write_csv('results/tss_all.csv')
 # chlorophyll a data from... 
   
 # how many samples per named location?
+doc_coltypes <- 'ccccTcdcc'
+doc_df <- read_csv('results/doc_all.csv', col_types = doc_coltypes) %>%
+  mutate(date = lubridate::as_date(collectDate))
+
 doc_summary <- doc_df %>% 
   group_by(siteID, namedLocation) %>% 
   dplyr::filter(!is.na(analyteConcentration)) %>%
@@ -51,3 +55,4 @@ doc_summary <- doc_df %>%
             max_doc_mgL = max(analyteConcentration)) 
 
 doc_summary %>% write_csv('results/doc-overview')
+

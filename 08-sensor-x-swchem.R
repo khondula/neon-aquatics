@@ -10,7 +10,7 @@ library(data.table)
 # overall distribution AND for days of sw sampling
 wq_dir <- '~/Box/data/NEON/NEON_water-quality'
 ts_dir <- '~/Box/data/NEON/wq-timeseries'
-mysite <- 'FLNT'
+mysite <- 'LEWI'
 
 
 # sensor positions with fDOM
@@ -22,7 +22,7 @@ fdom_positions <- fs::dir_ls(ts_dir, recurse = 1, regexp = 'fDOM') %>%
   dplyr::select(siteid, sensor_position)
 fdom_positions %>% write_csv('results/fdom_positions.csv')
 
-  
+# mysite <- 'HOPB'  
 join_doc_fdom <- function(mysite){
   fdom_positions_aos <- read_csv('results/fdom_positions_aos.csv') %>%
     dplyr::filter(siteid == mysite)
@@ -31,21 +31,29 @@ join_doc_fdom <- function(mysite){
   doc_df <- read_csv('results/doc_all.csv', col_types = doc_coltypes) %>%
     dplyr::filter(siteID == mysite) %>%
     mutate(date = lubridate::as_date(collectDate)) %>%
-    left_join(fdom_positions_aos, 
-              by = c("siteID" = "siteid", "namedLocation")) %>%
+    # left_join(fdom_positions_aos, 
+              # by = c("siteID" = "siteid", "namedLocation")) %>%
     mutate(time_hms = as_hms(collectDate))
     
   # how many sites?
-  # doc_df$namedLocation %>% unique()
+  doc_df$namedLocation %>% unique()
+  n_samples <- doc_df %>% 
+    dplyr::filter(!is.na(analyteConcentration)) %>% 
+    nrow()
   sample_dates <- doc_df$date %>% unique()
-  message(glue('{length(sample_dates)} DOC sample dates at {mysite}'))
+  message(glue('{n_samples} from {length(sample_dates)} DOC sample dates at {unique(doc_df$namedLocation)}'))
   # read in sensor data for fDOM for site
   fdom_df_all <- glue('{ts_dir}/{mysite}') %>% 
     fs::dir_ls(glob = '*fDOM*') %>%
     vroom::vroom() %>% 
     dplyr::filter(!is.na(fDOM)) %>%
-    mutate(date = lubridate::as_date(startDateTime))
-  # fdom_df_all$sensor_position %>% unique()
+    mutate(date = lubridate::as_date(startDateTime)) %>%
+    mutate(time_hms = as_hms(startDateTime))
+  
+  fdom_dates <- fdom_df_all$date %>% unique()
+  sensor_positions <- fdom_df_all$sensor_position %>% unique()
+  n_positions <- sensor_positions %>% length()
+  message(glue('fDOM at {n_positions} sensor positions at {mysite}: {sensor_positions}'))
   # how much data is flagged?
   # table(fdom_df_all$fDOMFinalQF)
   # redo this with custom colors, lines
@@ -68,22 +76,37 @@ join_doc_fdom <- function(mysite){
   # get values on sampling dates, plot on density plot to see range sampled
   # figure out a better color palette, facet by year and color by date?
   # adjust to local time for site? 
+  
+  dates_both <- sample_dates %>% 
+    intersect(fdom_dates) %>% as_date()
   doc_df_sub <- doc_df %>%
-    dplyr::filter(date %in% unique(fdom_df$date))
-  p1 <- fdom_df %>%
+    dplyr::filter(date %in% dates_both)
+  
+  fdom_df_qa <- fdom_df_all %>%
+    dplyr::filter(fDOMFinalQF %in% 0) %>%
+    mutate(sensor_position = as.character(sensor_position)) %>%
     dplyr::filter(date %in% sample_dates) %>%
-    mutate(time_hms = as_hms(startDateTime)) %>% 
+    mutate(time_hms = as_hms(startDateTime))
+  
+  fdom_df_all_sub <- fdom_df_all %>%
+    dplyr::filter(date %in% dates_both)
+    
+  p1 <- fdom_df_qa %>%
     mutate(date = as.character(date)) %>%
-    ggplot(aes(x = time_hms, y = fDOM, group = date)) +
+    mutate(sensor_position = as.character(sensor_position)) %>%
+    mutate(time_hms = as_hms(startDateTime)) %>% 
+    ggplot(aes(x = time_hms, y = fDOM)) +
     geom_vline(data = doc_df_sub, aes(xintercept = time_hms), lty = 2) +
-    geom_line(aes(col = date)) + 
+    geom_line(data = fdom_df_all_sub, col = 'gray') +
+    geom_line(aes(col = sensor_position)) +
     theme_minimal() +
     expand_limits(y = 0) +
     xlab("UTC time") +
     ggtitle(glue('{mysite} - fDOM on DOC grab sample days')) +
     facet_wrap(vars(date)) +
-    theme(legend.position = 'none')
+    theme(legend.position = 'right')
   p1
+  # ggsave(glue('figs/hobp-fdom-qa.png'), p1, width = 10, height = 6)
   ggsave(glue('figs/fdom/{mysite}-fdom.png'), p1, width = 6, height = 4)
   # facet plot with vertical lines for time of grab sample collection
   # and once time of AOP overpass is determined, facet plot with vertical lines 
@@ -91,9 +114,9 @@ join_doc_fdom <- function(mysite){
   # NOT CONVERTED TO LOCAL TIME, but for now... 
   # average (median) of day
   # might want to know how much of the day is represented by each value
-  # and how variable that day is... 
-  fdom_daily_df <- fdom_df %>%
-    dplyr::filter(date %in% sample_dates) %>%
+  # and how variable that day is...
+  fdom_daily_df <- fdom_df_qa %>%
+    dplyr::filter(date %in% as.character(sample_dates)) %>%
     group_by(siteid, sensor_position, date) %>%
     summarise(median_fDOM = median(fDOM),
               sd_fDOM = sd(fDOM),
@@ -101,13 +124,19 @@ join_doc_fdom <- function(mysite){
   
   # JOIN!! #
   doc_x_fdom <- doc_df %>% 
-    left_join(fdom_daily_df, by = c("siteID" = "siteid", "date"))
+    left_join(fdom_positions_aos,
+    by = c("siteID" = "siteid", "namedLocation")) %>%
+    mutate(date = as.character(date),
+           sensor_position = as.character(sensor_position)) %>%
+    left_join(fdom_daily_df, 
+              by = c("siteID" = "siteid", "date", "sensor_position"))
   
-  doc_x_fdom %>% write_csv(glue('results/doc-join-fdom/{mysite}-doc-join-fdom.csv'))
+  # doc_x_fdom %>% write_csv(glue('results/doc-join-fdom/{mysite}-doc-join-fdom.csv'))
   
   # add regression info to plot
   p2 <- doc_x_fdom %>% 
     filter(!is.na(median_fDOM)) %>%
+    filter(!is.na(analyteConcentration)) %>%
     ggplot(aes(x = analyteConcentration, y = median_fDOM)) +
     geom_smooth(method = 'lm') +
     geom_errorbar(aes(ymin = median_fDOM - sd_fDOM, 
@@ -116,10 +145,11 @@ join_doc_fdom <- function(mysite){
     xlab("DOC (mg/L)") +
     # ylab("fDOM")
     theme_minimal() +
+    facet_wrap(vars(sensor_position)) +
     expand_limits(x = 0, y = 0) +
     ggtitle(glue('{mysite} - fDOM vs DOC'))
-  # p2
-  ggsave(glue('figs/fdom-x-doc/{mysite}-fdom-x-doc.png'), p2, width = 4, height = 3)
+  p2
+  ggsave(glue('figs/fdom-x-doc/{mysite}-fdom-x-doc.png'), p2, width = 6, height = 3)
 }
 
 

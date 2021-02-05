@@ -117,6 +117,7 @@ rearrange_sensor_data <- function(mysite, wq_dir = '~/Box/data/NEON/NEON_water-q
 rearrange_sensor_data(aq_site_ids[30])
 
 # Remove files that have no non-NA values
+library(data.table)
 
 fDOM_files <- fs::dir_ls(ts_dir, recurse = 1, regexp = 'fDOM')
 
@@ -129,3 +130,16 @@ check_fDOM_nrows <- function(wq_ts_file){
 }
 
 fDOM_files %>% purrr::walk(~check_fDOM_nrows(.x))
+
+## Turbidity
+
+turb_files <- fs::dir_ls(ts_dir, recurse = 1, regexp = 'turbidity')
+check_turb_nrows <- function(wq_ts_file){
+  my_dt <- fread(wq_ts_file)
+  my_nrow <- nrow(my_dt[!is.na(turbidity)])
+  if(my_nrow<1){
+    fs::file_delete(wq_ts_file)
+    message(glue("No data in {basename(wq_ts_file)}, deleting"))}
+}
+
+turb_files %>% purrr::walk(~check_turb_nrows(.x))

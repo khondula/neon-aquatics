@@ -49,11 +49,17 @@ get_positions_files <- function(my_url){
 }
 
 my_files_list <- my_site_urls %>% purrr::map(~get_positions_files(.x))
+fs::dir_create(glue('{positions_dir}/{mysite}'))
 
+download_month <- function(my_files){
+  my_files_local <- glue('{positions_dir}/{mysite}/{my_files$files}')
+  purrr::walk2(.x = my_files$urls, .y = my_files_local, ~download.file(.x, .y))
+}
+my_files_list %>% purrr::walk(~download_month(.x))
 ##
 
-coords_df <- glue('{wq_dir}/{siteid}') %>%
-  fs::dir_ls(glob = "*sensor_positions*", recurse = 1) %>% 
+coords_df <- glue('{positions_dir}/{mysite}') %>%
+  fs::dir_ls(glob = "*sensor_positions*") %>% 
   purrr::map_dfr(~read_csv(.x, col_types = c("dccTlccTlddddddddd"))) %>%
   dplyr::select(HOR.VER, name, description, xOffset, yOffset, zOffset, 
                 referenceLatitude, referenceLongitude, referenceElevation) %>%
