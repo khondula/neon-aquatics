@@ -29,10 +29,11 @@ get_aop_dates <- function(aq_siteids){
   aop_dates <- read_csv('results/sites_join_aop_dates.csv') %>%
     dplyr::filter(siteID %in% aq_siteids) %>%
     dplyr::select(siteID, aop_site_id, flightdate) %>%
-    arrange(flightdate)
+    arrange(flightdate) %>% distinct()
   return(aop_dates)
 }
-get_aop_dates('LEWI')
+
+get_aop_dates('CARI')
 
 ### Or from API ###
 base_url <- 'http://data.neonscience.org/api/v0/'
