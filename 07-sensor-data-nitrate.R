@@ -106,8 +106,8 @@ rearrange_sensor_data_nitrate <- function(mysite, suna_dir = '~/Box/data/NEON/NE
 download_site_suna(aq_site_ids[2])
 rearrange_sensor_data_nitrate(aq_site_ids[2])
 
-aq_site_ids[31:34] %>% purrr::walk(~download_site_suna(.x))
-aq_site_ids[31:34] %>% purrr::walk(~rearrange_sensor_data_nitrate(.x))
+# aq_site_ids[31:34] %>% purrr::walk(~download_site_suna(.x))
+# aq_site_ids[31:34] %>% purrr::walk(~rearrange_sensor_data_nitrate(.x))
 
 # Remove files that have no non-NA values
 library(data.table)
@@ -126,15 +126,4 @@ check_suna_nrows <- function(SUNA_file){
 SUNA_files <- fs::dir_ls(suna_ts_dir, recurse = 1, regexp = 'SUNA')
 SUNA_files %>% purrr::walk(~check_suna_nrows(.x))
 
-## Turbidity
 
-turb_files <- fs::dir_ls(ts_dir, recurse = 1, regexp = 'turbidity')
-check_turb_nrows <- function(wq_ts_file){
-  my_dt <- fread(wq_ts_file)
-  my_nrow <- nrow(my_dt[!is.na(turbidity)])
-  if(my_nrow<1){
-    fs::file_delete(wq_ts_file)
-    message(glue("No data in {basename(wq_ts_file)}, deleting"))}
-}
-
-turb_files %>% purrr::walk(~check_turb_nrows(.x))

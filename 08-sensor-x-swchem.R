@@ -21,7 +21,7 @@ ts_dir <- '~/Box/data/NEON/wq-timeseries'
 # there may be multiple sensor positions per SITE
 fdom_positions <- read_csv('results/fdom_positions.csv', col_types = 'cc')
 
-mysite <- 'PRLA'
+mysite <- 'HOPB'
 join_doc_fdom <- function(mysite){
   # read in PREFERRED sensor positions file
   fdom_positions_aos <- read_csv('results/fdom_positions_aos.csv',

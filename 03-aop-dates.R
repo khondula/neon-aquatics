@@ -91,3 +91,6 @@ aop_meta_df %>% write_csv('results/aop_meta_df.csv')
 #  Digital camera: FLHTSTRT_EHCCCCCC(IMAGEDATETIME)-NNNN_ort.tif
 # IMAGEDATETIME: Date and time of image capture, YYYYMMDDHHmmSS
 
+# make a table of flight dates JOIN all sensor positions
+
+
