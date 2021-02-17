@@ -1,0 +1,338 @@
+domanID,domainName,siteid,description,aop_siteid,YearSiteVisit,year,flightdate,sensor_position
+D10,Central Plains,ARIK,Arikaree River Nitrate Analyzer S2,ARIK,2017_ARIK_1,2017,2017-05-25,102
+D10,Central Plains,ARIK,Arikaree River Nitrate Analyzer S2,ARIK,2017_ARIK_1,2017,2017-05-22,102
+D10,Central Plains,ARIK,Arikaree River Nitrate Analyzer S2,ARIK,2020_ARIK_2,2020,2020-06-20,102
+D10,Central Plains,ARIK,Arikaree River Nitrate Analyzer S2,ARIK,2020_ARIK_2,2020,2020-06-17,102
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2016_OSBS_2,2016,2016-09-23,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2017_OSBS_3,2017,2017-09-27,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-05,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-12,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-09-15,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-15,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-16,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-21,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-22,101
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2016_OSBS_2,2016,2016-09-23,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2017_OSBS_3,2017,2017-09-27,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-05,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-12,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-09-15,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-15,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-16,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-21,103
+D03,Southeast,BARC,Barco Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-22,103
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2013_SOAP_1,2013,2013-06-12,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2017_SOAP_2,2017,2017-06-27,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2017_SOAP_2,2017,2017-06-26,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2018_SOAP_3,2018,2018-06-11,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2018_SOAP_3,2018,2018-06-12,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2019_SOAP_4,2019,2019-06-15,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2019_SOAP_4,2019,2019-06-16,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2019_SOAP_4,2019,2019-06-11,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2019_SOAP_4,2019,2019-06-13,102
+D17,Pacific Southwest,BIGC,Upper Big Creek Nitrate Analyzer S2,SOAP,2019_SOAP_4,2019,2019-06-14,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2018_YELL_1,2018,2018-07-20,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2018_YELL_1,2018,2018-07-04,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2018_YELL_1,2018,2018-07-06,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2018_YELL_1,2018,2018-07-05,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2019_YELL_2,2019,2019-07-20,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2019_YELL_2,2019,2019-07-21,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2019_YELL_2,2019,2019-07-20,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2019_YELL_2,2019,2019-07-22,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2019_YELL_2,2019,2019-07-25,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-05,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-09,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-09,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-11,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-06,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-14,102
+D12,Northern Rockies,BLDE,Blacktail Deer Creek Nitrate Analyzer S2,YELL,2020_YELL_3,2020,2020-07-11,102
+D11,Southern Plains,BLUE,Not Used - Blue River Nitrate Analyzer S2,BLUE,2017_BLUE_1,2017,2017-05-06,102
+D11,Southern Plains,BLUE,Not Used - Blue River Nitrate Analyzer S2,BLUE,2017_BLUE_1,2017,2017-05-06,102
+D11,Southern Plains,BLUE,Blue River Nitrate Analyzer S2 Overhang,BLUE,2017_BLUE_1,2017,2017-05-06,112
+D11,Southern Plains,BLUE,Blue River Nitrate Analyzer S2 Overhang,BLUE,2017_BLUE_1,2017,2017-05-06,112
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2015_DELA_1,2015,2015-07-22,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2015_DELA_1,2015,2015-07-26,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2015_DELA_1,2015,2015-07-25,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2016_DELA_2,2016,2016-05-07,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2016_DELA_2,2016,2016-05-08,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2017_DELA_3,2017,2017-05-16,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2017_DELA_3,2017,2017-05-26,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2017_DELA_3,2017,2017-05-15,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2018_DELA_4,2018,2018-04-30,103
+D08,Ozarks Complex,BLWA,Black Warrior River Nitrate Analyzer Buoy,DELA,2019_DELA_5,2019,2019-04-29,103
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2017_BONA_1,2017,2017-07-31,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2017_BONA_1,2017,2017-08-05,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2017_BONA_1,2017,2017-08-06,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2018_BONA_2,2018,2018-08-09,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2018_BONA_2,2018,2018-06-24,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2018_BONA_2,2018,2018-08-11,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2018_BONA_2,2018,2018-06-24,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2019_BONA_3,2019,2019-07-31,102
+D19,Taiga,CARI,Caribou Creek Nitrate Analyzer S2,BONA,2019_BONA_3,2019,2019-08-11,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2017_NIWO_1,2017,2017-09-04,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2017_NIWO_1,2017,2017-09-06,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2017_NIWO_1,2017,2017-09-21,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2018_NIWO_2,2018,2018-08-11,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2018_NIWO_2,2018,2018-07-31,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2018_NIWO_2,2018,2018-08-10,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2018_NIWO_2,2018,2018-08-13,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2019_NIWO_3,2019,2019-08-19,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2019_NIWO_3,2019,2019-08-15,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2019_NIWO_3,2019,2019-08-26,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2019_NIWO_3,2019,2019-08-14,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2020_NIWO_4,2020,2020-07-20,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2020_NIWO_4,2020,2020-08-01,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2020_NIWO_4,2020,2020-08-07,102
+D13,Southern Rockies & Colorado Plateau,COMO,Como Creek Nitrate Analyzer S2,NIWO,2020_NIWO_4,2020,2020-07-31,102
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2016_UNDE_1,2016,2016-09-02,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2017_UNDE_2,2017,2017-09-12,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2017_UNDE_2,2017,2017-09-01,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2019_UNDE_3,2019,2019-06-06,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2019_UNDE_3,2019,2019-06-08,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2020_UNDE_4,2020,2020-08-06,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2020_UNDE_4,2020,2020-08-11,101
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2016_UNDE_1,2016,2016-09-02,103
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2017_UNDE_2,2017,2017-09-12,103
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2017_UNDE_2,2017,2017-09-01,103
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2019_UNDE_3,2019,2019-06-06,103
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2019_UNDE_3,2019,2019-06-08,103
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2020_UNDE_4,2020,2020-08-06,103
+D05,Great Lakes,CRAM,Crampton Lake Nitrate Analyzer Buoy,UNDE,2020_UNDE_4,2020,2020-08-11,103
+D04,Atlantic Neotropical,CUPE,Rio Cupeyes Nitrate Analyzer S2,CUPE,2018_CUPE_1,2018,2018-05-14,102
+D04,Atlantic Neotropical,CUPE,Rio Cupeyes Nitrate Analyzer S2,CUPE,2018_CUPE_1,2018,2018-05-20,102
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2014_JERC_1,2014,2014-05-21,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2016_JERC_2,2016,2016-09-20,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2016_JERC_2,2016,2016-09-22,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2017_JERC_3,2017,2017-09-17,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2017_JERC_3,2017,2017-09-18,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2018_JERC_4,2018,2018-09-19,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2018_JERC_4,2018,2018-09-20,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2018_JERC_4,2018,2018-09-16,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2019_JERC_5,2019,2019-09-07,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2019_JERC_5,2019,2019-09-06,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2019_JERC_5,2019,2019-08-30,103
+D03,Southeast,FLNT,Flint River Nitrate Analyzer Buoy,JERC,2019_JERC_5,2019,2019-09-06,103
+D04,Atlantic Neotropical,GUIL,Rio Guilarte Nitrate Analyzer S2,GUIL,2018_GUIL_1,2018,2018-05-21,102
+D01,Northeast,HOPB,Hop Brook Nitrate Analyzer S2,HOPB,2016_HOPB_1,2016,2016-08-18,102
+D01,Northeast,HOPB,Hop Brook Nitrate Analyzer S2,HOPB,2017_HOPB_2,2017,2017-08-23,102
+D01,Northeast,HOPB,Hop Brook Nitrate Analyzer S2,HOPB,2019_HOPB_3,2019,2019-08-26,102
+D01,Northeast,HOPB,Hop Brook Nitrate Analyzer S2 Overhang,HOPB,2016_HOPB_1,2016,2016-08-18,112
+D01,Northeast,HOPB,Hop Brook Nitrate Analyzer S2 Overhang,HOPB,2017_HOPB_2,2017,2017-08-23,112
+D01,Northeast,HOPB,Hop Brook Nitrate Analyzer S2 Overhang,HOPB,2019_HOPB_3,2019,2019-08-26,112
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2016_KONZ_1,2016,2016-07-11,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2016_KONZ_1,2016,2016-07-15,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2016_KONZ_1,2016,2016-07-17,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2017_KONZ_2,2017,2017-06-09,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2017_KONZ_2,2017,2017-06-05,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2018_KONZ_3,2018,2018-06-05,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2018_KONZ_3,2018,2018-05-30,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_5,2019,2019-07-13,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_5,2019,2019-07-12,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_5,2019,2019-07-16,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_5,2019,2019-07-15,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_4,2019,2019-05-16,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_4,2019,2019-05-17,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_4,2019,2019-05-22,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2019_KONZ_4,2019,2019-05-22,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2020_KONZ_6,2020,2020-07-08,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2020_KONZ_6,2020,2020-07-13,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2020_KONZ_6,2020,2020-07-07,102
+D06,Prairie Peninsula,KING,Kings Creek Nitrate Analyzer S2,KONZ,2020_KONZ_6,2020,2020-07-12,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2015_GRSM_1,2015,2015-08-13,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2015_GRSM_1,2015,2015-08-14,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2015_GRSM_1,2015,2015-08-05,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2015_GRSM_1,2015,2015-08-03,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2015_GRSM_1,2015,2015-08-16,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2015_GRSM_1,2015,2015-08-04,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-10,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-08,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-08,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-14,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-11,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-10,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2016_GRSM_2,2016,2016-06-09,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-19,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-06,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-26,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-20,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-17,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-12,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2017_GRSM_3,2017,2017-10-05,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2,GRSM,2018_GRSM_4,2018,2018-06-16,102
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2015_GRSM_1,2015,2015-08-13,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2015_GRSM_1,2015,2015-08-14,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2015_GRSM_1,2015,2015-08-05,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2015_GRSM_1,2015,2015-08-03,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2015_GRSM_1,2015,2015-08-16,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2015_GRSM_1,2015,2015-08-04,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-10,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-08,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-08,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-14,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-11,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-10,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2016_GRSM_2,2016,2016-06-09,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-19,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-06,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-26,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-20,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-17,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-12,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2017_GRSM_3,2017,2017-10-05,112
+D07,Appalachians & Cumberland Plateau,LECO,LeConte Creek Nitrate Analyzer S2 Overhang,GRSM,2018_GRSM_4,2018,2018-06-16,112
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2016_BLAN_1,2016,2016-08-07,102
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2016_BLAN_1,2016,2016-08-08,102
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2016_BLAN_1,2016,2016-07-27,102
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2017_BLAN_2,2017,2017-07-30,102
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2017_BLAN_2,2017,2017-08-01,102
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2019_BLAN_3,2019,2019-06-01,102
+D02,Mid-Atlantic,LEWI,Lewis Run Nitrate Analyzer S2,BLAN,2019_BLAN_3,2019,2019-05-28,102
+D05,Great Lakes,LIRO,Little Rock Lake Nitrate Analyzer Buoy,LIRO,2017_LIRO_1,2017,2017-09-11,103
+D05,Great Lakes,LIRO,Little Rock Lake Nitrate Analyzer Buoy,LIRO,2020_LIRO_2,2020,2020-08-16,103
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2017_WREF_1,2017,2017-06-19,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2017_WREF_1,2017,2017-06-22,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2017_WREF_1,2017,2017-06-21,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2017_WREF_1,2017,2017-06-21,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2018_WREF_2,2018,2018-07-12,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2018_WREF_2,2018,2018-07-11,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2018_WREF_2,2018,2018-07-08,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2019_WREF_3,2019,2019-07-12,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2019_WREF_3,2019,2019-07-14,102
+D16,Pacific Northwest,MART,Martha Creek Nitrate Analyzer S2,WREF,2019_WREF_3,2019,2019-07-12,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2015_TALL_1,2015,2015-07-17,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2015_TALL_1,2015,2015-07-18,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2015_TALL_1,2015,2015-07-20,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2015_TALL_1,2015,2015-07-19,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2015_TALL_1,2015,2015-07-16,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2016_TALL_2,2016,2016-05-07,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2016_TALL_2,2016,2016-05-06,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2017_TALL_3,2017,2017-05-14,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2018_TALL_4,2018,2018-04-27,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2018_TALL_4,2018,2018-04-29,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2018_TALL_4,2018,2018-04-30,102
+D08,Ozarks Complex,MAYF,Mayfield Creek Nitrate Analyzer S2,TALL,2019_TALL_5,2019,2019-04-27,102
+D06,Prairie Peninsula,MCDI,McDiffett Creek Nitrate Analyzer S2,MCDI,2017_MCDI_1,2017,2017-06-05,102
+D06,Prairie Peninsula,MCDI,McDiffett Creek Nitrate Analyzer S2,MCDI,2020_MCDI_2,2020,2020-07-13,102
+D16,Pacific Northwest,MCRA,McRae Creek Nitrate Analyzer S2,MCRA,2018_MCRA_1,2018,2018-07-16,102
+NA,NA,OKSR,Oksrukuyik Creek Nitrate Analyzer S2,NA,NA,NA,NA,102
+D02,Mid-Atlantic,POSE,Posey Creek Nitrate Analyzer S2,SCBI,2016_SCBI_1,2016,2016-07-21,102
+D02,Mid-Atlantic,POSE,Posey Creek Nitrate Analyzer S2,SCBI,2016_SCBI_1,2016,2016-07-20,102
+D02,Mid-Atlantic,POSE,Posey Creek Nitrate Analyzer S2,SCBI,2016_SCBI_1,2016,2016-07-23,102
+D02,Mid-Atlantic,POSE,Posey Creek Nitrate Analyzer S2,SCBI,2017_SCBI_2,2017,2017-07-30,102
+D02,Mid-Atlantic,POSE,Posey Creek Nitrate Analyzer S2,SCBI,2019_SCBI_3,2019,2019-06-01,102
+D02,Mid-Atlantic,POSE,Posey Creek Nitrate Analyzer S2,SCBI,2019_SCBI_3,2019,2019-05-24,102
+D11,Southern Plains,PRIN,Pringle Creek Nitrate Analyzer S2,PRIN,2016_PRIN_2,2016,2016-04-24,102
+D11,Southern Plains,PRIN,Pringle Creek Nitrate Analyzer S2,PRIN,2016_PRIN_2,2016,2016-04-27,102
+D11,Southern Plains,PRIN,Pringle Creek Nitrate Analyzer S2,PRIN,2017_PRIN_3,2017,2017-05-02,102
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2016_WOOD_1,2016,2016-06-30,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2016_WOOD_1,2016,2016-06-29,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-26,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-19,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-21,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-26,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-31,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-27,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-26,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-30,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-22,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-15,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-24,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-24,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-26,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-07-02,101
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2016_WOOD_1,2016,2016-06-30,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2016_WOOD_1,2016,2016-06-29,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-26,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-19,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-21,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-26,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-31,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-27,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-26,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-30,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-22,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-15,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-24,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-24,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-26,103
+D09,Northern Plains,PRLA,Prairie Lake Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-07-02,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2016_WOOD_1,2016,2016-06-30,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2016_WOOD_1,2016,2016-06-29,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-26,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-19,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2017_WOOD_2,2017,2017-06-21,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-26,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-31,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-27,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-26,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-30,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2019_WOOD_3,2019,2019-07-22,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-15,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-24,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-24,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-06-26,103
+D09,Northern Plains,PRPO,Prairie Pothole Nitrate Analyzer Buoy,WOOD,2020_WOOD_4,2020,2020-07-02,103
+D15,Great Basin,REDB,Red Butte Creek Nitrate Analyzer S2,REDB,2017_REDB_1,2017,2017-05-31,102
+D15,Great Basin,REDB,Red Butte Creek Nitrate Analyzer S2,REDB,2019_REDB_2,2019,2019-05-10,102
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2016_OSBS_2,2016,2016-09-23,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2017_OSBS_3,2017,2017-09-27,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-05,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-12,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-09-15,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-15,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-16,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-21,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-22,101
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2016_OSBS_2,2016,2016-09-23,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2017_OSBS_3,2017,2017-09-27,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-05,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-10-12,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2018_OSBS_4,2018,2018-09-15,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-15,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-16,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-21,103
+D03,Southeast,SUGG,Suggs Lake Nitrate Analyzer Buoy,OSBS,2019_OSBS_5,2019,2019-04-22,103
+D14,Desert Southwest,SYCA,Sycamore Creek Nitrate Analyzer S2,SYCA,2019_SYCA_1,2019,2019-09-12,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2013_TEAK_1,2013,2013-06-14,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2013_TEAK_1,2013,2013-06-15,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2017_TEAK_2,2017,2017-06-28,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2017_TEAK_2,2017,2017-06-29,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2017_TEAK_2,2017,2017-06-27,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2017_TEAK_2,2017,2017-06-30,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2018_TEAK_3,2018,2018-06-14,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2018_TEAK_3,2018,2018-06-15,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2018_TEAK_3,2018,2018-06-16,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2019_TEAK_4,2019,2019-06-16,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2019_TEAK_4,2019,2019-06-14,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2019_TEAK_4,2019,2019-06-15,102
+D17,Pacific Southwest,TECR,Teakettle 2 Creek Nitrate Analyzer S2,TEAK,2019_TEAK_4,2019,2019-06-17,102
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2015_LENO_1,2015,2015-07-20,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2015_LENO_1,2015,2015-07-25,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2015_LENO_1,2015,2015-07-21,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2016_LENO_2,2016,2016-05-08,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2016_LENO_2,2016,2016-05-14,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2017_LENO_3,2017,2017-05-17,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2017_LENO_3,2017,2017-05-25,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2018_LENO_4,2018,2018-04-29,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2018_LENO_4,2018,2018-04-28,103
+D08,Ozarks Complex,TOMB,Tombigbee River Nitrate Analyzer Buoy,LENO,2019_LENO_5,2019,2019-05-06,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2017_TOOL_1,2017,2017-07-14,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2017_TOOL_1,2017,2017-07-28,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2017_TOOL_1,2017,2017-07-13,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2017_TOOL_1,2017,2017-07-18,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2018_TOOL_2,2018,2018-07-07,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2018_TOOL_2,2018,2018-07-21,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2018_TOOL_2,2018,2018-07-20,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2018_TOOL_2,2018,2018-07-24,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2018_TOOL_2,2018,2018-07-23,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2019_TOOL_3,2019,2019-07-23,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2019_TOOL_3,2019,2019-07-09,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2019_TOOL_3,2019,2019-07-11,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2019_TOOL_3,2019,2019-07-22,103
+D18,Tundra,TOOK,Toolik Lake Nitrate Analyzer Buoy,TOOL,2019_TOOL_3,2019,2019-07-07,103
+NA,NA,WALK,Walker Branch Nitrate Analyzer S2,NA,NA,NA,NA,102
+D13,Southern Rockies & Colorado Plateau,WLOU,West St Louis Creek Nitrate Analyzer S2,WLOU,2017_WLOU_1,2017,2017-09-13,102
+D13,Southern Rockies & Colorado Plateau,WLOU,West St Louis Creek Nitrate Analyzer S2,WLOU,2019_WLOU_2,2019,2019-08-26,102
+D13,Southern Rockies & Colorado Plateau,WLOU,West St Louis Creek Nitrate Analyzer S2,WLOU,2020_WLOU_3,2020,2020-07-29,102
+D13,Southern Rockies & Colorado Plateau,WLOU,West St Louis Creek Nitrate Analyzer S2,WLOU,2020_WLOU_3,2020,2020-08-07,102

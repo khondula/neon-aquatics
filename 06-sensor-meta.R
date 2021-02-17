@@ -72,7 +72,8 @@ save_sensor_positions <- function(mysite){
   
   coords_df <- glue('{positions_dir}/{mysite}') %>%
     fs::dir_ls(glob = "*sensor_positions*") %>% 
-    purrr::map_dfr(~read_csv(.x, col_types = c("dccTlccTlddddddddd"))) %>%
+    # purrr::map_dfr(~read_csv(.x, col_types = c("dccTlccTlddddddddd"))) %>%
+    purrr::map_dfr(~read_csv(.x)) %>%
     dplyr::select(HOR.VER, name, description, xOffset, yOffset, zOffset, 
                   referenceLatitude, referenceLongitude, referenceElevation) %>%
     distinct()
@@ -84,9 +85,32 @@ save_sensor_positions <- function(mysite){
   
 }
 
-## TODO: function to get sensor positions for all aq sites ##
+# aq_site_ids[2] %>% purrr::walk(~save_sensor_positions(.x))
+# aq_site_ids[31:34] %>% purrr::walk(~save_sensor_positions(.x))
 # assume all lats and long in crs 4326?
 # what units are offset in? 
+
+# read in sensor position files
+suna_positions_df <- glue('{positions_dir}') %>%
+  fs::dir_ls(glob = "*SUNA-sensor-positions*", recurse = 1) %>%
+  purrr::map_df(~read_csv(.x), .id = 'filename') %>%
+  mutate(filename = basename(filename)) %>%
+  mutate(siteid = substr(filename, 1, 4)) %>%
+  mutate(sensor_position = substr(HOR.VER, 1, 3)) %>%
+  dplyr::select(siteid, sensor_position, name, description) %>%
+  distinct()
+
+# THEN, read in AOP flight dates with aquatic site ids 
+aq_aop_dates <- read_csv('results/aquatic-sites-aop-dates.csv') %>%
+  rename(aop_siteid = siteid)
+# and join
+suna_x_aop_df <- suna_positions_df %>%
+  left_join(aq_aop_dates, by = c('siteid' = 'siteID'))
+# domain, site id, aop site, sensor position, filght date
+suna_x_aop_df %>% 
+  dplyr::select(domanID, domainName, siteid, description, 
+                aop_siteid, YearSiteVisit, year, flightdate, sensor_position) %>%
+  write_csv('results/suna-x-aop.csv')
 
 sites_sf <- coords_df %>% sf::st_as_sf(coords = c("referenceLongitude", "referenceLatitude"), crs = 4326)
 # sites_sf %>% leaflet() %>% addTiles() %>% addMarkers(popup = ~description)

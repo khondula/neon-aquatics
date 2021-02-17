@@ -18,7 +18,7 @@ get_aop_dates <- function(aq_siteids){
   return(aop_dates)
 }
 
-mysite <- 'FLNT'
+mysite <- 'CARI'
 
 # siteID is the aquatic site
 
@@ -33,17 +33,33 @@ suna_df_all <- glue('{suna_ts_dir}/{mysite}') %>%
     vroom::vroom() %>% 
     dplyr::filter(!is.na(surfWaterNitrateMean)) %>%
     mutate(date = lubridate::as_date(startDateTime)) %>%
+  mutate(year = lubridate::year(startDateTime)) %>%
     mutate(time_hms = as_hms(startDateTime))
   
 suna_dates <- suna_df_all$date %>% unique()
 sensor_positions <- suna_df_all$sensor_position %>% unique()
 n_positions <- sensor_positions %>% length()
 message(glue('SUNA at {n_positions} sensor positions at {mysite}: {sensor_positions}'))
-  
+
+aop_dates_df <- data.frame(startDateTime = lubridate::as_datetime(aop_dates)) %>%
+  mutate(year = lubridate::year(startDateTime))
+
 # filter out all flagged data
 suna_df_qa <- suna_df_all %>% dplyr::filter(finalQF %in% 0)
 suna_qa_dates <- suna_df_qa$date %>% unique()
-  
+
+suna_df_all %>%
+  ggplot(aes(x = startDateTime, y = surfWaterNitrateMean)) +
+  geom_vline(data = aop_dates_df, aes(xintercept = startDateTime),
+             col = 'red', lwd = 0.5) +
+  geom_point(size = 0.5, alpha = 0.5, col = 'gray') +
+  geom_point(data = suna_df_qa, size = 0.5) +
+  facet_wrap(vars(sensor_position), ncol =1) +
+  theme_minimal() +
+  ggtitle(glue('SUNA and flights at {mysite}'))
+
+ggsave(glue('figs/suna-x-aop/{mysite}_suna-x-aop-ts.png'), width = 10, height = 6)
+
 dates_both <- aop_dates %>% intersect(suna_dates) %>% as_date()
 dates_both_qa <- aop_dates %>% intersect(suna_qa_dates) %>% as_date()
   
@@ -68,9 +84,24 @@ p1 <- suna_df_all_sub %>%
     ggtitle(glue('{mysite} - SUNA on AOP flight days')) +
     facet_wrap(vars(date)) +
     theme(legend.position = 'right')
-  p1
+p1
   
 ggsave(glue('figs/suna-x-aop/{mysite}_suna-x-aop.png'), p1, width = 10, height = 6)
 
 
+suna_x_aop_df2 <- readxl::read_excel('~/Box/data/NEON/meta/SUNA-x-AOP.xlsx',
+                                     col_types = c("text", "text", "text",
+                                                   "text", "text", "text",
+                                                   "numeric", "date", "text",
+                                                   "logical", "logical", "guess", "guess"))
+suna_x_aop_df2 <- suna_x_aop_df2 %>% 
+  rename(SUNA = 10) %>%
+  dplyr::filter(SUNA)
 
+suna_x_aop_summary <- suna_x_aop_df2 %>%
+  group_by(domanID, siteid, year, sensor_position) %>%
+  mutate(flightdate = lubridate::as_date(flightdate)) %>%
+  summarise(first_aop_date = min(flightdate),
+            last_aop_date = max(flightdate)) 
+
+suna_x_aop_summary %>% write_csv('results/suna-aop-summary.csv')
