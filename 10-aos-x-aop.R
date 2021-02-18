@@ -26,10 +26,7 @@ get_aos_x_aop <- function(mysite){
     return(aos_dates)
   }
   
-  my_aos_dates <- get_dates_site('HOPB')
-  
-  # aop_dates
-  # aop_date <- aop_dates[1]
+  my_aos_dates <- get_dates_site(mysite)
   
   get_bordering_dates <- function(aop_date){
     
@@ -49,7 +46,7 @@ get_aos_x_aop <- function(mysite){
   }
   
   
-  dates_df <- my_aos_dates %>% 
+  dates_df <- aop_dates %>% 
     purrr::map_dfr(~get_bordering_dates(.x)) %>% 
     mutate(siteid = mysite) %>%
     mutate(flightdate = aop_dates) %>%
@@ -63,4 +60,6 @@ get_aos_x_aop <- function(mysite){
   
   return(dates_df)
 }
+
+aos_x_aop_df <- aq_site_ids %>% purrr::map_dfr(~get_aos_x_aop(.x))
 
