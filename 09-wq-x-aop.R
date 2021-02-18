@@ -9,7 +9,7 @@ library(data.table)
 # wq_dir <- '~/Box/data/NEON/NEON_water-quality/'
 wq_ts_dir <- '~/Box/data/NEON/wq-timeseries/'
 qf_cols_list <- list(fDOM = 'fDOMFinalQF',
-                     )
+                     turbidity = 'turbidityFinalQF')
 
 aop_dates <- read_csv('results/sites_join_aop_dates.csv')
 get_aop_dates <- function(aq_siteids){
@@ -21,12 +21,15 @@ get_aop_dates <- function(aq_siteids){
 }
 
 aq_site_ids <- read_lines('aq_site_ids.txt')
-myparam <- 'fDOM'
-myQFcol <- qf_cols_list[[myparam]]
+# myparam <- 'fDOM'
+myparam <- 'turbidity'
 # siteID is the aquatic site
-mysite <- "BARC"
+mysite <- "HOPB"
 
-save_wq_x_aop_plots <- function(mysite){
+save_wq_x_aop_plots <- function(mysite, myparam = 'turbidity'){
+
+  myQFcol <- qf_cols_list[[myparam]]
+  glue('figs/{myparam}-x-aop') %>% fs::dir_create()
   
   aop_dates <- get_aop_dates(mysite) %>% pull(flightdate)
   aop_years <- as.Date(aop_dates) %>% lubridate::year() %>% unique()
@@ -37,7 +40,7 @@ save_wq_x_aop_plots <- function(mysite){
   wq_df_all <- glue('{wq_ts_dir}/{mysite}') %>% 
     fs::dir_ls(glob = glue('*{myparam}*')) %>%
     vroom::vroom() %>% 
-    dplyr::filter(!is.na(fDOM)) %>%
+    dplyr::filter(!is.na(!!sym(myparam))) %>%
     mutate(date = lubridate::as_date(startDateTime)) %>%
     mutate(year = lubridate::year(startDateTime)) %>%
     mutate(time_hms = as_hms(startDateTime))
@@ -98,8 +101,6 @@ save_wq_x_aop_plots <- function(mysite){
   
 }
 
-save_wq_x_aop_plots('TOOK')
-save_wq_x_aop_plots('CARI')
 
 
 

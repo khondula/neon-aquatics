@@ -28,17 +28,42 @@ get_values_site <- function(my_siteid, my_analyte){
   return(site_values_simp)
 }
 
+get_abs_vals <- function(my_siteid){
+  lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
+  chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
+  site_values <- chem_df %>% dplyr::filter(str_detect(analyte, 'Absorbance'))
+  site_values_simp <- site_values %>% 
+    dplyr::select(domainID, siteID, analyte) %>%
+    distinct()
+  return(site_values_simp)
+}
+get_abs_vals <- function(my_siteid){
+  lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*variables*")
+  chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
+  site_values <- chem_df %>% dplyr::filter(str_detect(analyte, 'Absorbance'))
+  site_values_simp <- site_values %>% 
+    dplyr::select(domainID, siteID, analyte) %>%
+    distinct()
+  return(site_values_simp)
+}
+
+wavelengths_df <- aq_site_ids %>% purrr::map_dfr(~get_abs_vals(.x))
+wavelengths_df %>% write_csv('results/site-wavelengths.csv')
 # 'UV Absorbance (250 nm)'
 
 # get_values_site('HOPB', 'DOC')
+suva280_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'UV Absorbance (280 nm)'))
+suva250_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'UV Absorbance (250 nm)'))
 doc_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'DOC'))
 tss_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'TSS'))
 
+suva280_df %>% write_csv('results/suva280_all.csv')
+suva_df %>% write_csv('results/suva250_all.csv')
 doc_df %>% write_csv('results/doc_all.csv')
 tss_df %>% write_csv('results/tss_all.csv')
 
 # chlorophyll a data from... 
-  
+
 # how many samples per named location?
 doc_coltypes <- 'ccccTcdcc'
 doc_df <- read_csv('results/doc_all.csv', col_types = doc_coltypes) %>%
