@@ -37,18 +37,26 @@ get_abs_vals <- function(my_siteid){
     distinct()
   return(site_values_simp)
 }
-get_abs_vals <- function(my_siteid){
+get_abs_vals2 <- function(my_siteid){
   lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*variables*")
   chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
-  site_values <- chem_df %>% dplyr::filter(str_detect(analyte, 'Absorbance'))
+  site_values <- chem_df %>% dplyr::filter(str_detect(fieldName, 'Absorbance'))
   site_values_simp <- site_values %>% 
-    dplyr::select(domainID, siteID, analyte) %>%
+    mutate(siteID = my_siteid) %>%
+    dplyr::select(siteID, fieldName, siteID) %>%
     distinct()
   return(site_values_simp)
 }
 
-wavelengths_df <- aq_site_ids %>% purrr::map_dfr(~get_abs_vals(.x))
+get_abs_vals2(aq_site_ids[1])
+
+wavelengths_df2 <- aq_site_ids[1:10] %>% purrr::map_dfr(~get_abs_vals2(.x))
+wavelengths_df3 <- aq_site_ids[11:20] %>% purrr::map_dfr(~get_abs_vals2(.x))
+wavelengths_df4 <- aq_site_ids[21:34] %>% purrr::map_dfr(~get_abs_vals2(.x))
+
+wavelengths_df4 %>% pull(fieldName) %>% unique()
 wavelengths_df %>% write_csv('results/site-wavelengths.csv')
+wavelengths_df2 %>% write_csv('results/site-wavelengths_vars.csv')
 # 'UV Absorbance (250 nm)'
 
 # get_values_site('HOPB', 'DOC')
