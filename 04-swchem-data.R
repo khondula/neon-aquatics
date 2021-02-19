@@ -19,9 +19,9 @@ mysite <- aq_site_ids[3]
 # Function to update chem values of surface water
 mysite <- 'ARIK'
 
-update_swchem_files <- function(mysite){
+update_swchem_files <- function(mysite, myglob){
   # current files
-  lab_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = "*externalLab*")
+  lab_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = glue("*{myglob}*"))
   months_have <- basename(lab_files) %>% str_sub(58, 64)
   
   base_url <- 'http://data.neonscience.org/api/v0/'
@@ -48,13 +48,14 @@ update_swchem_files <- function(mysite){
   my_site_urls <- my_site_to_get %>% pull(url)
   
   # filter to just the waq_instantaneous basic files
-  my_url <- my_site_urls[1]
+  # my_url <- my_site_urls[1]
   get_pattern_files <- function(my_url){
     data_files_req <- GET(my_url)
     data_files <- content(data_files_req, as = "text") %>%
       fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
     data_files_df <- data_files$data$files %>% 
-      filter(str_detect(name, "(externalLabData).*(basic)"))
+      filter(str_detect(name, glue('{myglob}.*(basic)')))
+      # filter(str_detect(name, "(externalLabData).*(basic)"))
     # future enhancement: check md5 sums for changes! 
     return_list <- NULL
     if(nrow(data_files_df) > 0){
@@ -77,8 +78,57 @@ update_swchem_files <- function(mysite){
   
 }
 
-# update_swchem_files(aq_site_ids[5])  
-aq_site_ids %>% purrr::walk(~update_swchem_files(.x))
+update_swchem_files('ARIK', 'externalLabData')
+# update_swchem_files(aq_site_ids[5])
+aq_site_ids %>% purrr::walk(~update_swchem_files(.x, myglob = 'externalLabData'))
+
+aq_site_ids %>% purrr::walk(~update_swchem_files(.x, myglob = 'fieldSuperParent'))
+
+##### make a table of all sites and sampling dates
+# maybe include whether or not data is downloaded if thats possible
+mysite <- 'HOPB'
+myglob <- 'fieldSuperParent'
+base_url <- 'http://data.neonscience.org/api/v0/'
+data_id <- 'DP1.20093.001' # surface water chem
+req_avail <- GET(glue('{base_url}/products/{data_id}'))
+avail_resp <- content(req_avail, as = 'text') %>% 
+  fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+
+# List of products by site code with month
+data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
+# make table of urls with site and months
+avail_df <- data_urls_list %>%
+  unlist() %>% as.data.frame() %>%
+  dplyr::rename(url = 1) %>%
+  mutate(siteid = str_sub(url, 56, 59)) %>%
+  mutate(month = str_sub(url, 61, 67)) %>%
+  dplyr::select(siteid, month, url)
+
+my_site_df <- avail_df %>% 
+  dplyr::filter(siteid == mysite)
+
+my_site_urls <- my_site_df %>% pull(url)
+
+# filter to just the waq_instantaneous basic files
+# my_url <- my_site_urls[1]
+get_pattern_files <- function(my_url){
+  data_files_req <- GET(my_url)
+  data_files <- content(data_files_req, as = "text") %>%
+    fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+  data_files_df <- data_files$data$files %>% 
+    filter(str_detect(name, "(fieldSuperParent).*(basic)"))
+  # future enhancement: check md5 sums for changes! 
+  return_list <- NULL
+  if(nrow(data_files_df) > 0){
+    return_list <- list(files = data_files_df$name, urls = data_files_df$url)}
+  return(return_list)
+}
+
+my_files_list <- my_site_urls %>% purrr::map(~get_pattern_files(.x))
+
+new_files <- my_files_list %>% map_lgl(~!is.null(.x))
+any_new <- any(new_files)
+
 
 
 ##### once things are updated and downloaded
