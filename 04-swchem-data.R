@@ -17,7 +17,7 @@ source('R/myfxns.R')
 mysite <- aq_site_ids[3]
 
 # Function to update chem values of surface water
-mysite <- 'HOPB'
+mysite <- 'ARIK'
 
 update_swchem_files <- function(mysite){
   # current files
@@ -42,11 +42,13 @@ update_swchem_files <- function(mysite){
   
   my_site_to_get <- avail_df %>% 
     dplyr::filter(siteid == mysite) %>%
-    dplyr::filter(!month %in% months_have)
+    dplyr::filter(!month %in% months_have) %>%
+    dplyr::filter(as.numeric(substr(month, 1, 4)) > 2011)
   
   my_site_urls <- my_site_to_get %>% pull(url)
   
   # filter to just the waq_instantaneous basic files
+  my_url <- my_site_urls[1]
   get_pattern_files <- function(my_url){
     data_files_req <- GET(my_url)
     data_files <- content(data_files_req, as = "text") %>%
