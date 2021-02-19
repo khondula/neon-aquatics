@@ -14,49 +14,46 @@ source('R/myfxns.R')
 
 # get number of DOC, TSS, chla samples per site
 
-mysite <- aq_site_ids[2]
+mysite <- aq_site_ids[3]
 
 # Function to update chem values of surface water
-# files using API
+mysite <- 'HOPB'
 
-# current files
-lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
-months_have <- basename(lab_files) %>% str_sub(58, 64)
-# API for all files from site
-# compare
-# download new ones
-base_url <- 'http://data.neonscience.org/api/v0/'
-data_id <- 'DP1.20093.001' # surface water chem
-req_avail <- GET(glue('{base_url}/products/{data_id}'))
-avail_resp <- content(req_avail, as = 'text') %>% 
+update_swchem_files <- function(mysite){
+  # current files
+  lab_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = "*externalLab*")
+  months_have <- basename(lab_files) %>% str_sub(58, 64)
+  
+  base_url <- 'http://data.neonscience.org/api/v0/'
+  data_id <- 'DP1.20093.001' # surface water chem
+  req_avail <- GET(glue('{base_url}/products/{data_id}'))
+  avail_resp <- content(req_avail, as = 'text') %>% 
     fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
   
-# List of products by site code with month
-data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
-# make table of urls with site and months
-avail_df <- data_urls_list %>%
+  # List of products by site code with month
+  data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
+  # make table of urls with site and months
+  avail_df <- data_urls_list %>%
     unlist() %>% as.data.frame() %>%
     dplyr::rename(url = 1) %>%
     mutate(siteid = str_sub(url, 56, 59)) %>%
     mutate(month = str_sub(url, 61, 67)) %>%
     dplyr::select(siteid, month, url)
   
-my_site_to_get <- avail_df %>% 
-  dplyr::filter(siteid == mysite) %>%
-  dplyr::filter(!month %in% months_have)
-
-my_site_urls <- my_site_to_get %>% pull(url)
+  my_site_to_get <- avail_df %>% 
+    dplyr::filter(siteid == mysite) %>%
+    dplyr::filter(!month %in% months_have)
   
-my_url <- my_site_urls[1]
-# filter to just the waq_instantaneous basic files
-get_pattern_files <- function(my_url){
+  my_site_urls <- my_site_to_get %>% pull(url)
+  
+  # filter to just the waq_instantaneous basic files
+  get_pattern_files <- function(my_url){
     data_files_req <- GET(my_url)
     data_files <- content(data_files_req, as = "text") %>%
       fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
     data_files_df <- data_files$data$files %>% 
       filter(str_detect(name, "(externalLabData).*(basic)"))
     # future enhancement: check md5 sums for changes! 
-    # compare to existing files!
     return_list <- NULL
     if(nrow(data_files_df) > 0){
       return_list <- list(files = data_files_df$name, urls = data_files_df$url)}
@@ -65,22 +62,22 @@ get_pattern_files <- function(my_url){
   
   my_files_list <- my_site_urls %>% purrr::map(~get_pattern_files(.x))
   
-  any_new <- my_files_list %>% map_lgl(~!is.null(.x)) %>% any()
+  new_files <- my_files_list %>% map_lgl(~!is.null(.x))
+  any_new <- any(new_files)
   if(!any_new){message(glue('No new lab data from {mysite}'))}
-  # download!
-  # for each object in list my_files (each month-year)
-  # download each of the files to local file
-
-# Get the sampling dates for months without data??
-# filter this list to just non NULL 
-my_files <- my_files_list[[4]]
-
-download_month <- function(my_files){
+  months_newfiles <- my_site_to_get[['month']][which(new_files)]
+  download_month <- function(my_files){
     my_files_local <- glue('{chem_dir}/{mysite}/{my_files$files}')
     purrr::walk2(.x = my_files$urls, .y = my_files_local, ~download.file(.x, .y))
   }
-my_files_list %>% purrr::walk(~download_month(.x))
+  my_files_list %>% purrr::walk(~download_month(.x))
+  if(any_new){message(glue('new lab data from {mysite} for: {glue_collapse(months_newfiles, ", ")}'))}
   
+}
+
+# update_swchem_files(aq_site_ids[5])  
+aq_site_ids %>% purrr::walk(~update_swchem_files(.x))
+
 
 ##### once things are updated and downloaded
 
