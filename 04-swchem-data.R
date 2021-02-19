@@ -3,20 +3,87 @@
 library(tidyverse)
 library(fs)
 library(glue)
-library(sf)
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(vroom)
 
 data_dir <- '~/Box/data/NEON/spatial'
 chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
-sites_df <- read_csv(glue('{data_dir}/field_sites.csv'))
-aq_site_ids <- sites_df %>% 
-  dplyr::filter(field_site_type %in% 
-                  c("Relocatable Aquatic", "Core Aquatic")) %>% 
-  pull(field_site_id)
+source('R/myfxns.R')
 
 # get number of DOC, TSS, chla samples per site
 
-my_siteid <- 'HOPB'
-my_analyte <- 'DOC'
+mysite <- aq_site_ids[2]
+
+# Function to update chem values of surface water
+# files using API
+
+# current files
+lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
+months_have <- basename(lab_files) %>% str_sub(58, 64)
+# API for all files from site
+# compare
+# download new ones
+base_url <- 'http://data.neonscience.org/api/v0/'
+data_id <- 'DP1.20093.001' # surface water chem
+req_avail <- GET(glue('{base_url}/products/{data_id}'))
+avail_resp <- content(req_avail, as = 'text') %>% 
+    fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+  
+# List of products by site code with month
+data_urls_list <- avail_resp$data$siteCodes$availableDataUrls
+# make table of urls with site and months
+avail_df <- data_urls_list %>%
+    unlist() %>% as.data.frame() %>%
+    dplyr::rename(url = 1) %>%
+    mutate(siteid = str_sub(url, 56, 59)) %>%
+    mutate(month = str_sub(url, 61, 67)) %>%
+    dplyr::select(siteid, month, url)
+  
+my_site_to_get <- avail_df %>% 
+  dplyr::filter(siteid == mysite) %>%
+  dplyr::filter(!month %in% months_have)
+
+my_site_urls <- my_site_to_get %>% pull(url)
+  
+my_url <- my_site_urls[1]
+# filter to just the waq_instantaneous basic files
+get_pattern_files <- function(my_url){
+    data_files_req <- GET(my_url)
+    data_files <- content(data_files_req, as = "text") %>%
+      fromJSON(simplifyDataFrame = TRUE, flatten = TRUE)
+    data_files_df <- data_files$data$files %>% 
+      filter(str_detect(name, "(externalLabData).*(basic)"))
+    # future enhancement: check md5 sums for changes! 
+    # compare to existing files!
+    return_list <- NULL
+    if(nrow(data_files_df) > 0){
+      return_list <- list(files = data_files_df$name, urls = data_files_df$url)}
+    return(return_list)
+  }
+  
+  my_files_list <- my_site_urls %>% purrr::map(~get_pattern_files(.x))
+  
+  any_new <- my_files_list %>% map_lgl(~!is.null(.x)) %>% any()
+  if(!any_new){message(glue('No new lab data from {mysite}'))}
+  # download!
+  # for each object in list my_files (each month-year)
+  # download each of the files to local file
+
+# Get the sampling dates for months without data??
+# filter this list to just non NULL 
+my_files <- my_files_list[[4]]
+
+download_month <- function(my_files){
+    my_files_local <- glue('{chem_dir}/{mysite}/{my_files$files}')
+    purrr::walk2(.x = my_files$urls, .y = my_files_local, ~download.file(.x, .y))
+  }
+my_files_list %>% purrr::walk(~download_month(.x))
+  
+
+##### once things are updated and downloaded
+
 
 get_values_site <- function(my_siteid, my_analyte){
   lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
@@ -28,6 +95,7 @@ get_values_site <- function(my_siteid, my_analyte){
   return(site_values_simp)
 }
 
+# getting absorbance wavelengths
 get_abs_vals <- function(my_siteid){
   lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
   chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
@@ -37,22 +105,6 @@ get_abs_vals <- function(my_siteid){
     distinct()
   return(site_values_simp)
 }
-get_abs_vals2 <- function(my_siteid){
-  lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*variables*")
-  chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
-  site_values <- chem_df %>% dplyr::filter(str_detect(fieldName, 'Absorbance'))
-  site_values_simp <- site_values %>% 
-    mutate(siteID = my_siteid) %>%
-    dplyr::select(siteID, fieldName, siteID) %>%
-    distinct()
-  return(site_values_simp)
-}
-
-get_abs_vals2(aq_site_ids[1])
-
-wavelengths_df2 <- aq_site_ids[1:10] %>% purrr::map_dfr(~get_abs_vals2(.x))
-wavelengths_df3 <- aq_site_ids[11:20] %>% purrr::map_dfr(~get_abs_vals2(.x))
-wavelengths_df4 <- aq_site_ids[21:34] %>% purrr::map_dfr(~get_abs_vals2(.x))
 
 wavelengths_df4 %>% pull(fieldName) %>% unique()
 wavelengths_df %>% write_csv('results/site-wavelengths.csv')
