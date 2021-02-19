@@ -17,12 +17,15 @@ source('R/myfxns.R')
 mysite <- aq_site_ids[3]
 
 # Function to update chem values of surface water
-mysite <- 'ARIK'
+mysite <- 'HOPB'
+myglob <- 'fieldSuperParent'
 
 update_swchem_files <- function(mysite, myglob){
   # current files
   lab_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = glue("*{myglob}*"))
-  months_have <- basename(lab_files) %>% str_sub(58, 64)
+  sub1 <- nchar(basename(lab_files)[1])-33
+  sub2 <- nchar(basename(lab_files)[1])-27
+  months_have <- basename(lab_files) %>% str_sub(sub1, sub2)
   
   base_url <- 'http://data.neonscience.org/api/v0/'
   data_id <- 'DP1.20093.001' # surface water chem
