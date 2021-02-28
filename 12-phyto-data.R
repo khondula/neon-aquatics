@@ -9,6 +9,7 @@ library(vroom)
 
 # data_dir <- '~/Box/data/NEON/spatial'
 phyto_dir <- '~/Box/data/NEON/NEON_chem-peri-ses-phyto'
+phyto_dir2 <- '~/Box/data/NEON/chl-a'
 source('R/myfxns.R')
 
 mysite <- aq_site_ids[3]
@@ -75,5 +76,83 @@ update_phyto_files <- function(mysite, myglob){
   
 }
 
+update_phyto_files('ARIK', 'alg_fieldData')
+aq_site_ids %>% purrr::walk(~update_phyto_files(.x, 'alg_fieldData'))
+
 update_phyto_files('ARIK', 'algaeExternalLabDataPerSample')
+aq_site_ids %>% purrr::walk(~update_phyto_files(.x, 'algaeExternalLabDataPerSample'))
+
+# join the field and lab data files 
+# by site-months
+join_field_and_lab <- function(mysite){
+  glue('{phyto_dir}/{mysite}') %>% fs::dir_create()
+  lab_files <- fs::dir_ls(glue('{phyto_dir}/{mysite}'), glob = glue("*algaeExternalLabDataPerSample*"))
+  field_files <- fs::dir_ls(glue('{phyto_dir}/{mysite}'), glob = glue("*alg_fieldData*"))
+  sub1 <- nchar(basename(lab_files)[1])-33
+  sub2 <- nchar(basename(lab_files)[1])-27
+  months_have <- basename(lab_files) %>% str_sub(sub1, sub2)
+  # my_month <- '2018-03'
+  join_month <- function(my_month){
+    lab_df <- grep(my_month, lab_files, value = TRUE) %>% 
+      read_csv() %>% 
+      dplyr::select(domainID, siteID, namedLocation, collectDate,
+                    sampleID, sampleCondition, replicate,
+                    analyte, analyteConcentration, plantAlgaeLabUnits,
+                    externalLabDataQF)
+    field_cols <- 'cccccdddddcTcccccccccccccccccc'
+    field_df <- grep(my_month, field_files, value = TRUE) %>% 
+      read_csv(col_types = field_cols) %>% 
+      mutate(time_hms = as_hms(collectDate),
+             collect_date = as_date(collectDate)) %>%
+      dplyr::select(namedLocation, aquaticSiteType, collect_date,
+                    time_hms, parentSampleID, habitatType,
+                    algalSampleType, phytoDepth1,
+                    phytoDepth2, phytoDepth3, substratumSizeClass)
+    
+    lab_join_field <- lab_df %>% 
+      left_join(field_df, by = c('sampleID' = 'parentSampleID',
+                                 'namedLocation')) %>%
+      dplyr::select(domainID, siteID, aquaticSiteType,
+                    collectDate, time_hms,
+                    namedLocation, sampleID, 
+                    analyte, analyteConcentration, plantAlgaeLabUnits,
+                    algalSampleType, habitatType, substratumSizeClass,
+                    sampleCondition, replicate,
+                    phytoDepth1, phytoDepth2, phytoDepth3,
+                    externalLabDataQF)
+    return(lab_join_field)
+  }
+  all_lab_join_field <- months_have %>% purrr::map_dfr(~join_month(.x))
+  all_lab_join_field %>%
+    write_csv(glue('{phyto_dir2}/{mysite}_phyto-chem.csv'))
+}
+  
+aq_site_ids %>% purrr::walk(~join_field_and_lab(.x))
+
+# just because there is a file doesnt mean 
+# that there is chl a data... 
+
+mysite <- 'POSE'
+my_analytes <- c('chlorophyll a', 'pheophytin', 'total cholorophyll a')
+
+get_values_site <- function(mysite, my_analyte){
+  my_files <- fs::dir_ls(phyto_dir2, glob = glue("*{mysite}*"))
+  chla_coltypes <- 'cccDtcccdcccccidddc'
+  chem_df <- my_files %>% purrr::map_df(~read_csv(.x, col_types = chla_coltypes))
+  site_values <- chem_df %>% dplyr::filter(analyte %in% my_analytes)
+  site_values_simp <- site_values %>% 
+    dplyr::filter(!is.na(analyteConcentration))
+  return(site_values_simp)
+}
+
+get_values_site('ARIK', my_analytes)
+phyto_df <- aq_site_ids %>% 
+  purrr::map_dfr(~get_values_site(.x, my_analytes))
+
+phyto_df$algalSampleType %>% table()
+phyto_df$externalLabDataQF 
+# maybe add in dates to when you are saving these files
+phyto_df %>% write_csv('results/all-phyto-data.csv')
+
+
 
