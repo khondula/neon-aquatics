@@ -105,3 +105,25 @@ suna_x_aop_summary <- suna_x_aop_df2 %>%
             last_aop_date = max(flightdate)) 
 
 suna_x_aop_summary %>% write_csv('results/suna-aop-summary.csv')
+
+
+## with aos dates now
+
+# suna_x_aop <- read_csv('~/Box/data/NEON/meta/suna-aop-summary_csv.csv')
+suna_x_aop <- readxl::read_excel('~/Box/data/NEON/meta/suna-aop-summary.xlsx', 
+                                 col_types = c("text", "text", "numeric",
+                                               "text", "date", "date", "text",
+                                               "text", "text", "date", "date",
+                                               "text", "guess", "guess", "guess")) %>%
+  mutate(first_aop_date = as_date(first_aop_date),
+         last_aop_date = as_date(last_aop_date),
+         aos_pre = as_date(aos_pre),
+         aos_post = as_date(aos_post))
+
+suna_x_aop_df <- suna_x_aop %>%
+  mutate(range_start = aos_pre - dweeks(1),
+         range_end = aos_post + dweeks(1))
+
+suna_x_aop_df %>% write_csv('results/get-raw-suna.csv')
+
+suna_x_aop_df$get_raw_suna %>% table()

@@ -42,7 +42,7 @@ get_aop_dates <- function(aq_siteids){
   return(aop_dates)
 }
 
-get_aop_dates('CARI')
+get_aop_dates('PRLA')
 
 ### Or from API ###
 base_url <- 'http://data.neonscience.org/api/v0/'

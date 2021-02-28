@@ -65,3 +65,5 @@ sites_x_aop <- sites_x_aop %>%
   mutate(sitetype = substr(namedLocation, 10, nchar(namedLocation)))
 
 sites_x_aop %>% write_csv('results/sites_x_aop.csv')
+
+

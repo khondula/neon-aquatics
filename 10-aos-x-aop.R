@@ -10,34 +10,28 @@ library(lubridate)
 
 source('R/myfxns.R')
 
-mysite <- aq_site_ids[1]
+mysite <- aq_site_ids[9]
 
-get_aos_x_aop <- function(mysite){
+# assume that there will be lab data available 
+# for all samples
+location_types <- NULL
+
+get_aos_x_aop <- function(mysite, location_types = NULL){
   aop_dates <- get_aop_dates(mysite) %>% pull(flightdate)
-  get_dates_site <- function(my_siteid){
-    chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
-    lab_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = "*externalLab*")
-    chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
-    aos_dates <- chem_df %>% 
-      # filter to analyte of interest here
-      dplyr::filter(!is.na(analyteConcentration)) %>%
-      pull(startDate) %>% 
-      lubridate::as_date() %>% unique()
-    return(aos_dates)
-  }
   
-  my_aos_dates <- get_dates_site(mysite)
+  my_aos_dates <- get_aos_dates(mysite, location_types) %>% 
+    pull(collect_date) %>% unique()
   
   get_bordering_dates <- function(aop_date){
     
     before_date <- NA
-    if(any(which(my_aos_dates < aop_date))){
-      before_date_id <- max(which(my_aos_dates < aop_date))
+    if(any(which(my_aos_dates <= aop_date))){
+      before_date_id <- max(which(my_aos_dates <= aop_date))
       before_date <- my_aos_dates[before_date_id]
     }
     after_date <- NA
-    if(any(which(my_aos_dates > aop_date))){
-      after_date_id <- min(which(my_aos_dates > aop_date))
+    if(any(which(my_aos_dates >= aop_date))){
+      after_date_id <- min(which(my_aos_dates >= aop_date))
       after_date <- my_aos_dates[after_date_id]
     }
     
@@ -61,5 +55,23 @@ get_aos_x_aop <- function(mysite){
   return(dates_df)
 }
 
-aos_x_aop_df <- aq_site_ids %>% purrr::map_dfr(~get_aos_x_aop(.x))
+get_aos_x_aop('HOPB')
 
+aos_x_aop_df <-  aq_site_ids %>% purrr::map_dfr(~get_aos_x_aop(.x))
+
+aos_x_aop_df <- aos_x_aop_df %>% 
+  filter(!is.na(flightdate)) %>%
+  rowwise() %>%
+  mutate(min_days = min(days_before, days_after, na.rm = TRUE))
+
+aos_x_aop_df %>% write_csv('results/aos-x-aop.csv')
+
+aos_x_aop_df %>%
+  ggplot(aes(x = min_days)) +
+  geom_histogram(binwidth = 1, fill = 'dodgerblue', col = 'gray', lwd = 0.2) +
+  theme_minimal() +
+  coord_cartesian(xlim = c(-1, 30)) +
+  ggtitle('Days between flight and sampling (< 30)')
+
+ggsave('figs/days-gap.png')
+   

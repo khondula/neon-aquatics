@@ -108,7 +108,8 @@ join_field_and_lab <- function(mysite){
                     time_hms, parentSampleID, habitatType,
                     algalSampleType, phytoDepth1,
                     phytoDepth2, phytoDepth3, substratumSizeClass)
-    
+    # Do join with fuzzy string matching here instead...
+    # cant do by sample ID and parent sample ID
     lab_join_field <- lab_df %>% 
       left_join(field_df, by = c('sampleID' = 'parentSampleID',
                                  'namedLocation')) %>%
