@@ -100,7 +100,7 @@ join_field_and_lab <- function(mysite){
                     analyte, analyteConcentration, plantAlgaeLabUnits,
                     externalLabDataQF) %>%
       # extract one or more characters at start other than /
-      mutate(parentSampleID = str_extract(sampleID, '[^/]+'))
+      mutate(sampleID_sub = str_extract(sampleID, '[^/]+'))
     field_cols <- 'cccccdddddcTcccccccccccccccccc'
     field_df <- grep(my_month, field_files, value = TRUE) %>% 
       read_csv(col_types = field_cols) %>% 
@@ -111,6 +111,12 @@ join_field_and_lab <- function(mysite){
                     algalSampleType, phytoDepth1,
                     phytoDepth2, phytoDepth3, substratumSizeClass)
     
+    # make lookup table between sampleId and parentSampleID
+    field_df$parentSampleID %>%
+      set_names(field_df$parentSampleID) %>%
+      purrr::map(~grep(.x, lab_df$sampleID, value = TRUE)) %>%
+      purrr::map_df(~as_tibble(.x), .id = 'parentSampleID')
+
     lab_join_field <- lab_df %>% 
       left_join(field_df, by = c('parentSampleID', 'namedLocation')) %>%
       dplyr::select(domainID, siteID, aquaticSiteType,
