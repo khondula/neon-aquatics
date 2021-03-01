@@ -98,9 +98,7 @@ join_field_and_lab <- function(mysite){
       dplyr::select(domainID, siteID, namedLocation, collectDate,
                     sampleID, sampleCondition, replicate,
                     analyte, analyteConcentration, plantAlgaeLabUnits,
-                    externalLabDataQF) %>%
-      # extract one or more characters at start other than /
-      mutate(sampleID_sub = str_extract(sampleID, '[^/]+'))
+                    externalLabDataQF)
     field_cols <- 'cccccdddddcTcccccccccccccccccc'
     field_df <- grep(my_month, field_files, value = TRUE) %>% 
       read_csv(col_types = field_cols) %>% 
@@ -111,22 +109,19 @@ join_field_and_lab <- function(mysite){
                     algalSampleType, phytoDepth1,
                     phytoDepth2, phytoDepth3, substratumSizeClass)
     
-    # make lookup table between sampleId and parentSampleID
-    field_df$parentSampleID %>%
+    # make table between sampleId and parentSampleID
+    # based on field table
+    my_lookups <- field_df$parentSampleID %>%
       set_names(field_df$parentSampleID) %>%
       purrr::map(~grep(.x, lab_df$sampleID, value = TRUE)) %>%
-      purrr::map_df(~as_tibble(.x), .id = 'parentSampleID')
+      purrr::map_df(~as_tibble(.x), .id = 'parentSampleID') %>%
+      rename(sampleID = value) %>% 
+      distinct()
 
     lab_join_field <- lab_df %>% 
-      left_join(field_df, by = c('parentSampleID', 'namedLocation')) %>%
-      dplyr::select(domainID, siteID, aquaticSiteType,
-                    collectDate, time_hms,
-                    namedLocation, sampleID, 
-                    analyte, analyteConcentration, plantAlgaeLabUnits,
-                    algalSampleType, habitatType, substratumSizeClass,
-                    sampleCondition, replicate,
-                    phytoDepth1, phytoDepth2, phytoDepth3,
-                    externalLabDataQF)
+      left_join(my_lookups, by = 'sampleID')
+      left_join(field_df, by = c('parentSampleID')) 
+    
     return(lab_join_field)
   }
   all_lab_join_field <- months_have %>% purrr::map_dfr(~join_month(.x))
