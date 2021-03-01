@@ -91,7 +91,7 @@ join_field_and_lab <- function(mysite){
   sub1 <- nchar(basename(lab_files)[1])-33
   sub2 <- nchar(basename(lab_files)[1])-27
   months_have <- basename(lab_files) %>% str_sub(sub1, sub2)
-  my_month <- months_have[17]
+  # my_month <- months_have[1]
   join_month <- function(my_month){
     lab_df <- grep(my_month, lab_files, value = TRUE) %>% 
       read_csv() %>% 
@@ -119,8 +119,8 @@ join_field_and_lab <- function(mysite){
       distinct()
 
     lab_join_field <- lab_df %>% 
-      left_join(my_lookups, by = 'sampleID')
-      left_join(field_df, by = c('parentSampleID')) 
+      left_join(my_lookups, by = 'sampleID') %>%
+      left_join(field_df, by = c('parentSampleID', 'namedLocation')) 
     
     return(lab_join_field)
   }
@@ -139,8 +139,8 @@ my_analytes <- c('chlorophyll a', 'pheophytin', 'total cholorophyll a')
 
 get_values_site <- function(mysite, my_analyte){
   my_files <- fs::dir_ls(phyto_dir2, glob = glue("*{mysite}*"))
-  chla_coltypes <- 'cccDtcccdcccccidddc'
-  chem_df <- my_files %>% purrr::map_df(~read_csv(.x, col_types = chla_coltypes))
+  # chla_coltypes <- 'cccDtcccdcccccidddc'
+  chem_df <- my_files %>% purrr::map_df(~read_csv(.x))
   site_values <- chem_df %>% dplyr::filter(analyte %in% my_analytes)
   site_values_simp <- site_values %>% 
     dplyr::filter(!is.na(analyteConcentration))
@@ -152,7 +152,13 @@ phyto_df <- aq_site_ids %>%
   purrr::map_dfr(~get_values_site(.x, my_analytes))
 
 phyto_df$algalSampleType %>% table()
-phyto_df$externalLabDataQF 
+phyto_summary <- phyto_df %>%
+  dplyr::filter(algalSampleType %in% c('seston', 'phytoplankton')) %>%
+  group_by(siteID, namedLocation, collectDate, analyte, algalSampleType) %>%
+  summarise(n = n()) %>% 
+  tidyr::pivot_wider(names_from = analyte, values_from = n)
+phyto_summary %>% write_csv('results/phyto-data-overview.csv')
+
 # maybe add in dates to when you are saving these files
 phyto_df %>% write_csv('results/all-phyto-data.csv')
 
