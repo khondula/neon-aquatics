@@ -6,14 +6,15 @@ library(httr)
 library(jsonlite)
 library(lubridate)
 library(vroom)
+library(hms)
 
 # data_dir <- '~/Box/data/NEON/spatial'
 phyto_dir <- '~/Box/data/NEON/NEON_chem-peri-ses-phyto'
 phyto_dir2 <- '~/Box/data/NEON/chl-a'
 source('R/myfxns.R')
 
-mysite <- aq_site_ids[3]
-myglob <- 'algaeExternalLabDataPerSample'
+mysite <- aq_site_ids[4]
+# myglob <- 'algaeExternalLabDataPerSample'
 
 update_phyto_files <- function(mysite, myglob){
   # current files
@@ -77,9 +78,8 @@ update_phyto_files <- function(mysite, myglob){
 }
 
 update_phyto_files('ARIK', 'alg_fieldData')
-aq_site_ids %>% purrr::walk(~update_phyto_files(.x, 'alg_fieldData'))
-
 update_phyto_files('ARIK', 'algaeExternalLabDataPerSample')
+aq_site_ids %>% purrr::walk(~update_phyto_files(.x, 'alg_fieldData'))
 aq_site_ids %>% purrr::walk(~update_phyto_files(.x, 'algaeExternalLabDataPerSample'))
 
 # join the field and lab data files 
@@ -91,14 +91,16 @@ join_field_and_lab <- function(mysite){
   sub1 <- nchar(basename(lab_files)[1])-33
   sub2 <- nchar(basename(lab_files)[1])-27
   months_have <- basename(lab_files) %>% str_sub(sub1, sub2)
-  # my_month <- '2018-03'
+  my_month <- months_have[17]
   join_month <- function(my_month){
     lab_df <- grep(my_month, lab_files, value = TRUE) %>% 
       read_csv() %>% 
       dplyr::select(domainID, siteID, namedLocation, collectDate,
                     sampleID, sampleCondition, replicate,
                     analyte, analyteConcentration, plantAlgaeLabUnits,
-                    externalLabDataQF)
+                    externalLabDataQF) %>%
+      # extract one or more characters at start other than /
+      mutate(parentSampleID = str_extract(sampleID, '[^/]+'))
     field_cols <- 'cccccdddddcTcccccccccccccccccc'
     field_df <- grep(my_month, field_files, value = TRUE) %>% 
       read_csv(col_types = field_cols) %>% 
@@ -108,11 +110,9 @@ join_field_and_lab <- function(mysite){
                     time_hms, parentSampleID, habitatType,
                     algalSampleType, phytoDepth1,
                     phytoDepth2, phytoDepth3, substratumSizeClass)
-    # Do join with fuzzy string matching here instead...
-    # cant do by sample ID and parent sample ID
+    
     lab_join_field <- lab_df %>% 
-      left_join(field_df, by = c('sampleID' = 'parentSampleID',
-                                 'namedLocation')) %>%
+      left_join(field_df, by = c('parentSampleID', 'namedLocation')) %>%
       dplyr::select(domainID, siteID, aquaticSiteType,
                     collectDate, time_hms,
                     namedLocation, sampleID, 
