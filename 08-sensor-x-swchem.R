@@ -8,6 +8,9 @@ library(data.table)
 
 wq_dir <- '~/Box/data/NEON/NEON_water-quality'
 ts_dir <- '~/Box/data/NEON/wq-timeseries'
+chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
+source('R/myfxns.R')
+
 # mysite <- 'ARIK'
 
 # sensor positions with fDOM
@@ -211,9 +214,114 @@ doc_x_fdom %>%
 # ggsave(glue('figs/fdom-x-doc2.png'))
 
 # TURBIDITY
+mysite <- 'HOPB'
+
+sensor_positions_aos <- read_csv('results/fdom_positions_aos.csv',
+                               col_types = 'ccc') %>%
+  dplyr::filter(siteid == mysite)
 
 fs::dir_ls(ts_dir, recurse = 1, regexp = 'turbidity') %>% 
   basename() %>% as.data.frame() %>%
   mutate(siteid = substr(., 1, 4),
          sensor_position = substr(., 22, 24)) %>%
   dplyr::select(siteid, sensor_position)
+
+tss_df <- read_csv('results/tss_all.csv') %>%
+  dplyr::filter(siteID == mysite) %>%
+  dplyr::filter(!is.na(analyteConcentration)) %>%
+  mutate(date = lubridate::as_date(collectDate)) %>%
+  mutate(time_hms = as_hms(collectDate))
+
+# how many sites?
+tss_df$namedLocation %>% unique()
+n_samples <- tss_df %>% nrow()
+sample_dates <- tss_df$date %>% unique()
+message(glue('{n_samples} TSS samples from {length(sample_dates)} dates at {mysite}'))
+
+# read in sensor data for fDOM for site
+turbidity_df_all <- glue('{ts_dir}/{mysite}') %>% 
+  fs::dir_ls(glob = '*turbidity*') %>%
+  vroom::vroom() %>% 
+  dplyr::filter(!is.na(turbidity)) %>%
+  mutate(date = lubridate::as_date(startDateTime)) %>%
+  mutate(time_hms = as_hms(startDateTime))
+
+turb_dates <- turbidity_df_all$date %>% unique()
+sensor_positions <- turbidity_df_all$sensor_position %>% unique()
+n_positions <- sensor_positions %>% length()
+message(glue('turbidity at {n_positions} sensor positions at {mysite}: 
+             {glue_collapse(sensor_positions, ", ")}'))
+
+sensor_positions_aos
+
+# filter out all flagged data
+turb_df_qa <- turbidity_df_all %>% dplyr::filter(turbidityFinalQF %in% 0)
+turb_qa_dates <- turb_df_qa$date %>% unique()
+# adjust to local time for site? 
+
+dates_both <- sample_dates %>% intersect(turb_dates) %>% as_date()
+dates_both_qa <- sample_dates %>% intersect(turb_qa_dates) %>% as_date()
+tss_df_sub <- tss_df %>% dplyr::filter(date %in% dates_both)
+
+# subset FDOM data to sampling dates
+turb_df_qa_sub <- turb_df_qa %>%
+  mutate(sensor_position = as.character(sensor_position)) %>%
+  dplyr::filter(date %in% dates_both)
+
+turb_df_all_sub <- turbidity_df_all %>%
+  mutate(sensor_position = as.character(sensor_position)) %>%
+  dplyr::filter(date %in% dates_both)
+
+# if there is one sensor position
+p1 <- turb_df_all_sub %>%
+  mutate(date = as.character(date)) %>%
+  ggplot(aes(x = time_hms, y = turbidity)) +
+  geom_vline(data = tss_df_sub, aes(xintercept = time_hms), lty = 2) +
+  geom_line(col = 'gray') +
+  geom_line(data = turb_df_all_sub, aes(col = sensor_position)) +
+  theme_minimal() +
+  expand_limits(y = 0) +
+  xlab("UTC time") +
+  ggtitle(glue('{mysite} - turbidity on TSS grab sample days')) +
+  facet_wrap(vars(date), scales = 'free_y') +
+  theme(legend.position = 'right')
+p1
+
+turb_daily_df <- turb_df_qa_sub %>%
+  group_by(siteid, sensor_position, date) %>%
+  summarise(median_turbidity = median(turbidity),
+            sd_turbidity = sd(turbidity),
+            se_turbidity = sd_turbidity/n())
+
+# JOIN!! #
+tss_x_turb <- tss_df_sub %>% 
+  left_join(sensor_positions_aos,
+            by = c("siteID" = "siteid", "namedLocation")) %>%
+  mutate(sensor_position = as.character(sensor_position)) %>%
+  left_join(turb_daily_df, 
+            by = c("siteID" = "siteid", "date", "sensor_position"))
+
+# doc_x_fdom %>% write_csv(glue('results/doc-join-fdom/{mysite}-doc-join-fdom.csv'))
+
+# add regression info to plot
+p2 <- tss_x_turb %>% 
+  filter(!is.na(median_turbidity)) %>%
+  filter(!is.na(analyteConcentration)) %>%
+  ggplot(aes(x = analyteConcentration, y = median_turbidity)) +
+  geom_smooth(method = 'lm', se = TRUE) +
+  geom_errorbar(aes(ymin = median_turbidity - sd_turbidity, 
+                    ymax = median_turbidity + sd_turbidity)) +
+  geom_point(aes(fill = sampleCondition), pch = 21) +
+  xlab("TSS (mg/L)") +
+  # ylab("fDOM")
+  theme_minimal() +
+  facet_wrap(vars(sampleCondition), scales = 'free') +
+  expand_limits(x = 0, y = 0) +
+  # scale_x_log10() +
+  # theme(legend.position = 'none') +
+  ggtitle(glue('{mysite} - turbidity vs TSS'))
+p2
+
+
+ggsave(glue('figs/{mysite}-turbidity-qa.png'), p1, width = 10, height = 6)
+

@@ -2,6 +2,8 @@
 # from SUVA 254 and 280
 # need DOC measurements to 
 # convert SUVA to absorbance 
+suva280_df <- read_csv('results/suva280_all.csv')
+suva254_df <- read_csv('results/suva254_all.csv')
 
 head(suva254_df)
 head(suva280_df)

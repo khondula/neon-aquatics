@@ -154,7 +154,7 @@ phyto_df <- aq_site_ids %>%
 phyto_df$algalSampleType %>% table()
 phyto_summary <- phyto_df %>%
   dplyr::filter(algalSampleType %in% c('seston', 'phytoplankton')) %>%
-  group_by(siteID, namedLocation, collectDate, analyte, algalSampleType) %>%
+  group_by(domainID, siteID, namedLocation, collectDate, analyte, algalSampleType) %>%
   summarise(n = n()) %>% 
   tidyr::pivot_wider(names_from = analyte, values_from = n)
 phyto_summary %>% write_csv('results/phyto-data-overview.csv')

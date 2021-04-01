@@ -22,6 +22,7 @@ myglob <- 'fieldSuperParent'
 
 update_swchem_files <- function(mysite, myglob){
   # current files
+  chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
   lab_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = glue("*{myglob}*"))
   sub1 <- nchar(basename(lab_files)[1])-33
   sub2 <- nchar(basename(lab_files)[1])-27
@@ -110,7 +111,8 @@ aos_dates_df <- aq_site_ids %>% purrr::map_dfr(~get_aos_dates(.x))
 aos_dates_df %>% write_csv('results/all-aos-dates.csv')
 
 ### SW CHEM DATA ####
-get_values_site <- function(my_siteid, my_analyte){
+get_values_site_swchem <- function(my_siteid, my_analyte){
+  chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
   lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
   chem_df <- lab_files %>% purrr::map_df(~read_csv(.x))
   site_values <- chem_df %>% dplyr::filter(analyte == my_analyte)
@@ -137,10 +139,10 @@ wavelengths_df2 %>% write_csv('results/site-wavelengths_vars.csv')
 # 'UV Absorbance (250 nm)'
 
 # get_values_site('HOPB', 'DOC')
-suva280_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'UV Absorbance (280 nm)'))
-suva254_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'UV Absorbance (250 nm)'))
-doc_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'DOC'))
-tss_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site(.x, my_analyte = 'TSS'))
+suva280_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site_swchem(.x, my_analyte = 'UV Absorbance (280 nm)'))
+suva254_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site_swchem(.x, my_analyte = 'UV Absorbance (250 nm)'))
+doc_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site_swchem(.x, my_analyte = 'DOC'))
+tss_df <- aq_site_ids %>% purrr::map_dfr(~get_values_site_swchem(.x, my_analyte = 'TSS'))
 
 suva280_df %>% write_csv('results/suva280_all.csv')
 suva254_df %>% write_csv('results/suva254_all.csv')
