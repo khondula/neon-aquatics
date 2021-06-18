@@ -1,0 +1,164 @@
+---
+title: "In situ data"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(fs)
+library(glue)
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(vroom)
+```
+
+# Get surface water chem data
+
+Searching NEON API for files within a data product. Files are saved in Box
+
+```{r}
+source('R/myfxns.R')
+chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
+lake_river_sites <- c('BARC', 'SUGG', 'CRAM', 'LIRO', 'PRPO', 'PRLA', 'TOOK', 'FLNT', 'BLWA', 'TOMB', 'BLUE')
+# TODO: extract update_swchem_files function to source 
+lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'externalLabData'))
+lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'fieldSuperParent'))
+lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'swc_fieldData'))
+```
+
+# Sampling Dates
+
+once things are updated and downloaded, make a table of all sites and sampling dates
+
+```{r}
+get_aos_dates <- function(mysite){
+  fsp_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = "*swc_fieldData*")
+  fsp_df <- fsp_files %>% purrr::map_df(~read_csv(.x)) # update to vroom? 
+  fsp_df_sub <- fsp_df %>% 
+    dplyr::select(domainID, siteID, namedLocation, collectDate, 
+                sampleID, replicateNumber)
+  field_sample_dates_df <- fsp_df_sub %>% 
+    mutate(collect_date = lubridate::as_date(collectDate)) %>% 
+    mutate(collect_datetime = collectDate) %>% 
+    dplyr::select(domainID, siteID, namedLocation, collect_date, collect_datetime) %>%
+    distinct()
+  return(field_sample_dates_df)
+}
+aos_dates_df <- lake_river_sites %>% purrr::map_dfr(~get_aos_dates(.x))
+aos_dates_df <- aos_dates_df %>% 
+  mutate(loctype = str_sub(namedLocation, 10, nchar(namedLocation))) %>%
+  mutate(loctype4 = str_sub(loctype, 1, 4))
+```
+
+## Surface water chemistry
+
+Get data for a selected analyte
+
+```{r}
+get_values_site_swchem <- function(my_siteid, my_analyte){
+  chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
+  lab_files <- fs::dir_ls(glue('{chem_dir}/{my_siteid}'), glob = "*externalLab*")
+  chem_df <- lab_files %>% vroom::vroom(delim = ',')
+  site_values <- chem_df %>% dplyr::filter(analyte %in% my_analyte)
+  site_values_simp <- site_values %>% 
+    dplyr::select(uid, domainID, siteID, namedLocation, collectDate,
+                  analyte, analyteConcentration, analyteUnits, sampleCondition)
+  return(site_values_simp)
+}
+```
+
+```{r}
+my_siteid <- 'SUGG'
+my_analytes <- c('TSS', 'TDS', 'DOC', 'TOC', 'Fe', 
+                 'UV Absorbance (250 nm)', 'UV Absorbance (254 nm)',
+                 'UV Absorbance (280 nm)')
+site_chem_df <- get_values_site_swchem(my_siteid, my_analytes)
+site_chem_df <- site_chem_df %>%
+  dplyr::mutate(analyte = dplyr::case_when(analyte == 'UV Absorbance (250 nm)' ~ 'UV Absorbance (254 nm)',
+                                           TRUE ~ analyte))
+
+
+```
+
+read in aop dates for site 
+
+```{r}
+aop_dates <- read_csv('../spectra/results/spectra-ids.csv') %>%
+  dplyr::filter(siteID == my_siteid) %>%
+  mutate(flightdate = str_sub(flightline, 1, 8)) %>%
+  mutate(flightdate = as_date(flightdate)) %>%
+  dplyr::select(siteID, flightdate, clouds, loctype) %>%
+  mutate(namedLocation = glue('{my_siteid}.AOS.{loctype}'))
+```
+
+```{r}
+site_chem_df
+```
+
+```{r}
+gg <- site_chem_df %>%
+  ggplot(aes(x = as_date(collectDate), y = analyteConcentration)) +
+  facet_grid(vars(analyte), vars(namedLocation), scales = 'free_y') +
+  # facet_wrap(vars(analyte), scales = 'free_y') +
+  theme_bw() +
+  coord_cartesian(ylim = c(0, NA)) +
+  theme(legend.position = 'bottom', legend.box="vertical") +
+  ggtitle(glue('{my_siteid} AOS sampling')) +
+  geom_vline(data = aop_dates, aes(xintercept = flightdate, col = clouds)) +
+  scale_color_manual(values = list("Green (<10%) cloud cover" = "green", 
+                                   "Red (> 50%) cloud cover" = "red", 
+                                   "Yellow (10 - 50%) cloud cover" = "orange")) +
+  geom_line(col = 'gray') +
+  geom_point(aes(fill = sampleCondition), pch = 21, size = 2) +
+  scale_fill_viridis_d() +
+  xlab(element_blank())
+gg
+# ggsave(glue('figs/{my_siteid}-AOSxAOP.png'), width = 12, height = 8)
+```
+
+time difference is the number of days before (-) or after (+) the flight time that the grab sampling occurred
+
+```{r}
+site_spectra_df <- readxl::read_excel('../spectra/results/spectra-ids.xlsx') %>% 
+  dplyr::filter(siteID == my_siteid)
+
+spectra_id <- 'BARC-buoy-20140507_152342'
+
+my_analyte <- 'DOC'
+
+get_closest_sample <- function(spectra_id, my_analyte){
+  spectra_date <- str_sub(spectra_id, 10, 18) %>% as_date()
+  spectra_loc <- str_sub(spectra_id, 6, 9)
+  my_df <- site_chem_df %>% 
+    dplyr::filter(analyte == my_analyte) %>%
+    dplyr::filter(str_detect(namedLocation, spectra_loc)) %>%
+    mutate(collectDateDate = as_date(collectDate))
+# probably wont work if there are replicates
+# or when multiple buoy depths
+  min_id <- abs(spectra_date - my_df$collectDateDate) %>% which.min()
+  my_samp <- my_df[min_id,] %>% 
+    mutate(timediff = collectDateDate - spectra_date) %>%
+    dplyr::select(-uid) %>% mutate(spectra = spectra_id)
+  return(my_samp)
+}
+
+match_df <- my_analytes %>% purrr::map_df(~get_closest_sample('BARC-buoy-20140507_152342', .x))
+
+# expand.grid(site_spectra_df$spectraID, my_analytes)
+match_inputs <- tidyr::expand_grid(site_spectra_df$spectraID, my_analytes) %>%
+  dplyr::rename(spectraID = 1, analyte = 2)
+match_df <- purrr::map2_dfr(.x = match_inputs$spectraID,
+                            .y = match_inputs$analyte,
+                            .f = ~get_closest_sample(.x, .y))
+
+
+```
+
+
