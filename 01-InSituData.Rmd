@@ -23,7 +23,7 @@ library(vroom)
 
 Searching NEON API for files within a data product. Files are saved in Box
 
-```{r}
+```{r, eval = FALSE}
 source('R/myfxns.R')
 chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
 lake_river_sites <- c('BARC', 'SUGG', 'CRAM', 'LIRO', 'PRPO', 'PRLA', 'TOOK', 'FLNT', 'BLWA', 'TOMB', 'BLUE')
@@ -37,7 +37,7 @@ lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'swc_fieldDat
 
 once things are updated and downloaded, make a table of all sites and sampling dates
 
-```{r}
+```{r, eval = FALSE}
 get_aos_dates <- function(mysite){
   fsp_files <- fs::dir_ls(glue('{chem_dir}/{mysite}'), glob = "*swc_fieldData*")
   fsp_df <- fsp_files %>% purrr::map_df(~read_csv(.x)) # update to vroom? 
@@ -75,7 +75,10 @@ get_values_site_swchem <- function(my_siteid, my_analyte){
 ```
 
 ```{r}
-my_siteid <- 'SUGG'
+my_siteid <- 'BLUE'
+```
+
+```{r}
 my_analytes <- c('TSS', 'TDS', 'DOC', 'TOC', 'Fe', 
                  'UV Absorbance (250 nm)', 'UV Absorbance (254 nm)',
                  'UV Absorbance (280 nm)')
@@ -99,7 +102,7 @@ aop_dates <- read_csv('../spectra/results/spectra-ids.csv') %>%
 ```
 
 ```{r}
-site_chem_df
+# site_chem_df
 ```
 
 ```{r}
@@ -120,22 +123,26 @@ gg <- site_chem_df %>%
   scale_fill_viridis_d() +
   xlab(element_blank())
 gg
-# ggsave(glue('figs/{my_siteid}-AOSxAOP.png'), width = 12, height = 8)
+ggsave(glue('figs/{my_siteid}-AOSxAOP.png'), width = 12, height = 8)
 ```
 
 time difference is the number of days before (-) or after (+) the flight time that the grab sampling occurred
+
+GO through with CRAM or TOOK or LIRO where there are multiple buoy depths to pull all buoy samples/reps
 
 ```{r}
 site_spectra_df <- readxl::read_excel('../spectra/results/spectra-ids.xlsx') %>% 
   dplyr::filter(siteID == my_siteid)
 
-spectra_id <- 'BARC-buoy-20140507_152342'
-
-my_analyte <- 'DOC'
+# site_spectra_df$spectraID[1]
+# spectra_id <- 'BLUE-S2-20170506_160715'
+# str_split(spectra_id, "-", simplify = TRUE)[,2]
+# my_analyte <- 'DOC'
 
 get_closest_sample <- function(spectra_id, my_analyte){
-  spectra_date <- str_sub(spectra_id, 10, 18) %>% as_date()
-  spectra_loc <- str_sub(spectra_id, 6, 9)
+  spectra_date <- str_split(spectra_id, "-", simplify = TRUE)[,3] %>%
+    str_sub(1,8) %>% as_date()
+  spectra_loc <- str_split(spectra_id, "-", simplify = TRUE)[,2]
   my_df <- site_chem_df %>% 
     dplyr::filter(analyte == my_analyte) %>%
     dplyr::filter(str_detect(namedLocation, spectra_loc)) %>%
@@ -149,16 +156,30 @@ get_closest_sample <- function(spectra_id, my_analyte){
   return(my_samp)
 }
 
-match_df <- my_analytes %>% purrr::map_df(~get_closest_sample('BARC-buoy-20140507_152342', .x))
+# match_df <- my_analytes %>% purrr::map_df(~get_closest_sample('BARC-buoy-20140507_152342', .x))
 
-# expand.grid(site_spectra_df$spectraID, my_analytes)
+```
+
+
+```{r}
 match_inputs <- tidyr::expand_grid(site_spectra_df$spectraID, my_analytes) %>%
   dplyr::rename(spectraID = 1, analyte = 2)
 match_df <- purrr::map2_dfr(.x = match_inputs$spectraID,
                             .y = match_inputs$analyte,
                             .f = ~get_closest_sample(.x, .y))
-
-
 ```
+
+```{r}
+match_df %>% write_csv(glue('results/spectra-matches/{my_siteid}-spectra-matches.csv'))
+```
+
+## chlorophyll a in situ data
+
+now do the same with phytoplankton sampling and taxonomy
+
+## sensor data
+
+then same for sensor data
+
 
 
