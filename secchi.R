@@ -16,7 +16,7 @@ library(lubridate)
 library(vroom)
 lake_river_sites <- c('BARC', 'SUGG', 'CRAM', 'LIRO', 'PRPO', 'PRLA', 'TOOK', 'FLNT', 'BLWA', 'TOMB', 'BLUE')
 
-mysite <- 'PRLA'
+mysite <- 'BARC'
 myglob <- 'dep_secchi'
 
 update_secchi_files <- function(mysite, myglob){
@@ -25,7 +25,10 @@ update_secchi_files <- function(mysite, myglob){
   fs::dir_create(glue('{product_dir}/{mysite}'))
   current_files <- fs::dir_ls(glue('{product_dir}/{mysite}'), glob = glue("*{myglob}*"))
   filenames_split <- basename(current_files) %>% str_split("\\.", simplify = TRUE)
-  months_have <- filenames_split[,8]
+  months_have <- c()
+  if(nrow(filenames_split > 0)){
+    months_have <- filenames_split[,8]
+  }
   
   base_url <- 'http://data.neonscience.org/api/v0/'
   data_id <- 'DP1.20252.001' # secchi depth
@@ -43,10 +46,9 @@ update_secchi_files <- function(mysite, myglob){
     mutate(month = str_sub(url, 61, 67)) %>%
     dplyr::select(siteid, month, url)
   
-  my_site_to_get <- avail_df %>% dplyr::filter(siteid == mysite)
-    # dplyr::filter(siteid == mysite) %>%
-    # dplyr::filter(!month %in% months_have) %>%
-    # dplyr::filter(as.numeric(substr(month, 1, 4)) > 2011)
+  my_site_to_get <- avail_df %>% 
+    dplyr::filter(siteid == mysite) %>%
+    dplyr::filter(!month %in% months_have) 
   
   my_site_urls <- my_site_to_get %>% pull(url)
   
@@ -80,6 +82,6 @@ update_secchi_files <- function(mysite, myglob){
   
 }
 
-update_secchi_files('TOOK', 'dep_secchi')
+update_secchi_files('BARC', 'dep_secchi')
 
 lake_river_sites %>% purrr::walk(~update_secchi_files(.x, myglob = 'dep_secchi'))
