@@ -85,3 +85,59 @@ update_secchi_files <- function(mysite, myglob){
 update_secchi_files('BARC', 'dep_secchi')
 
 lake_river_sites %>% purrr::walk(~update_secchi_files(.x, myglob = 'dep_secchi'))
+
+## Plotting
+
+mysite <- 'PRPO'
+
+product_dir <- '~/Box/data/NEON/NEON_depth-secchi'
+
+# combine_secchi <- function(mysite){
+#   site_secchi_df <- fs::dir_ls(glue('{product_dir}/{mysite}')) %>%
+#     vroom::vroom(delim = ',')
+#   secchi_path <- glue('results/secchi-x-site/{mysite}-secchi.csv')
+#   site_secchi_df %>% write_csv(secchi_path)
+# }
+# 
+# lake_river_sites %>% purrr::walk(~combine_secchi(.x))
+read_csv('results/secchi-x-site/BLWA-secchi.csv') %>% head()
+secchi_df <- fs::dir_ls('results/secchi-x-site') %>%
+  purrr::map_dfr(~read_csv(.x)) %>%
+  dplyr::select(domainID, siteID, namedLocation, date, clearToBottom, 
+                maxDepth, euphoticDepth, icePresent, secchiMeanDepth, remarks)
+
+secchi_df$namedLocation %>% unique()
+secchi_df %>% dplyr::filter(siteID == 'BLWA') %>% View()
+
+secchi_df %>%
+  ggplot(aes(x = date, y = clearToBottom)) +
+  geom_point(aes(fill = clearToBottom), pch = 21) +
+  facet_wrap(vars(namedLocation))
+
+aop_dates <- read_csv('../spectra/results/spectra-ids.csv') %>%
+  # dplyr::filter(siteID == my_siteid) %>%
+  mutate(flightdate = str_sub(flightline, 1, 8)) %>%
+  mutate(flightdate = as_date(flightdate)) %>%
+  dplyr::select(siteID, nmdLctn, flightdate, clouds, loctype) %>%
+  rename(namedLocation = nmdLctn) %>%
+  dplyr::filter(namedLocation %in% secchi_df$namedLocation)
+
+secchi_df %>%
+  ggplot(aes(x = as_date(date), y = secchiMeanDepth)) +
+  geom_vline(data = aop_dates, aes(xintercept = flightdate), col = 'purple') +
+  geom_line(col = 'red') +
+  geom_line(aes(y = euphoticDepth), col = 'red', lwd = 0.25) +
+  geom_line(aes(y = maxDepth)) +
+  geom_point(aes(y = maxDepth, fill = clearToBottom, shape = icePresent), alpha = 0.75) +
+  scale_shape_manual(values = c(21, 22)) +
+  scale_fill_manual(values = list('N' = 'green', 'Y' = 'blue', 'NA' = 'gray')) +
+  geom_hline(aes(yintercept = 0), col = 'blue') +
+  scale_y_reverse() +
+  facet_wrap(vars(namedLocation), scales = 'free') +
+  theme_bw() +
+  xlab(element_blank()) +
+  ylab("Depth (m)") +
+  ggtitle('Secchi depth (red) and max depth (black/points)')
+
+ggsave('figs/secchi-depth.png', width = 16, height = 6)
+ggsave('../spectra/figs/secchi-depth.png', width = 16, height = 6)
