@@ -1,0 +1,193 @@
+---
+title: "Compare AIS and AOS"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(fs)
+library(glue)
+library(lubridate)
+library(vroom)
+library(hms)
+library(data.table)
+```
+
+# Chlorophyll a
+
+```{r}
+my_siteid <- 'BARC'
+my_aos_site <- 'BARC.AOS.buoy.c0'
+```
+
+## AOS data
+
+```{r}
+
+phyto_df_mysite <- phyto_df_sub %>% 
+  dplyr::filter(siteID == my_siteid) 
+aos_dates <- phyto_df_mysite %>% 
+  dplyr::filter(!is.na(analyteConcentration)) %>%
+  dplyr::filter(namedLocation %in% my_aos_site) %>%
+  pull(collectDate) %>% unique()
+phyto_df_myloc <- phyto_df_mysite %>%
+  dplyr::filter(!is.na(analyteConcentration)) %>%
+  dplyr::filter(namedLocation %in% my_aos_site) %>%
+  dplyr::select(1:15) %>%
+  mutate(collect_datetime = as_datetime(glue('{collect_date} {time_hms}')))
+```
+
+```{r}
+aos_datetimes <- unique(phyto_df_myloc$collect_datetime)
+```
+
+
+## AIS data
+
+```{r}
+ts_dir <- '~/Box/data/NEON-processed/wq-timeseries'
+fs::dir_ls(ts_dir, recurse = 1, regexp = 'chlorophyll') %>% 
+  basename() %>% as.data.frame() %>%
+  mutate(siteid = substr(., 1, 4),
+         sensor_position = substr(., nchar(.) - 6, nchar(.) - 4)) %>%
+  dplyr::select(siteid, sensor_position) %>%
+  dplyr::filter(siteid %in% my_siteid)
+```
+
+```{r}
+chlais_df_all <- glue('{ts_dir}/{mysite}') %>% 
+  fs::dir_ls(glob = '*chlorophyll*') %>%
+  vroom::vroom() %>% 
+  dplyr::filter(!is.na(chlorophyll)) %>%
+  mutate(date = lubridate::as_date(startDateTime)) %>%
+  mutate(time_hms = as_hms(startDateTime))
+```
+
+```{r}
+aos_dates_df <- data.frame(date = aos_dates)
+```
+
+```{r}
+chlais_df_all %>%
+  dplyr::filter(chlorophyllFinalQF %in% 0) %>%
+  group_by(date) %>%
+  summarise(mean_chl = mean(chlorophyll, na.rm = TRUE), 
+            sd_chl = sd(chlorophyll, na.rm = TRUE)) %>% 
+  ggplot(aes(x = date, y = mean_chl)) +
+  geom_vline(data = aos_dates_df, aes(xintercept = date), col = 'purple') +
+  geom_errorbar(aes(ymin = mean_chl - sd_chl, ymax = mean_chl + sd_chl), lwd = 0.2) +
+  geom_point(alpha = 0.5, size = 1, fill = 'green', pch = 21) +
+  theme_bw() +
+  scale_x_date(date_labels = '%b %Y') +
+  ggtitle(glue('Daily avg Chla (sensor) at {mysite} w/AOS dates'))
+
+ggsave(glue('figs/{my_siteid}-AISxAOS-chla.png'), width = 6, height = 2)
+```
+
+Filter AIS data to days of AOS sampling, plot each day
+
+```{r}
+chlais_aosdates <- chlais_df_all %>%
+  dplyr::filter(chlorophyllFinalQF %in% 0) %>%
+  dplyr::filter(date %in% aos_dates)
+```
+
+```{r}
+phyto_df_myloc_chla <- 
+  dplyr::filter(phyto_df_myloc, analyte == 'chlorophyll a') %>%
+  rename(date = collectDate) %>% dplyr::filter(date %in% chlais_aosdates$date)
+
+chlais_aosdates %>%
+  ggplot(aes(x = time_hms, y = chlorophyll)) +
+  geom_vline(data = phyto_df_myloc_chla, aes(xintercept = time_hms), col = 'green') +
+  geom_hline(data = phyto_df_myloc_chla, aes(yintercept = analyteConcentration),
+             col = 'green') +
+  geom_errorbar(aes(ymin = chlorophyll - chlorophyllExpUncert,
+                    ymax = chlorophyll + chlorophyllExpUncert)) +
+  geom_point(aes(fill = as.character(date)), pch = 21, alpha = 0.75) +
+  geom_point(data = phyto_df_myloc_chla, 
+             aes(y = analyteConcentration), 
+             pch = 23, fill = 'green', size = 3, alpha = 0.75) +
+  theme_bw() +
+  facet_wrap(vars(date)) +
+  theme(legend.position = 'none') +
+  ggtitle(glue('AIS and AOS chla at {my_siteid}')) +
+  xlab('Time (UTC)')
+
+ggsave(glue('figs/{my_siteid}-AISxAOS-chl2.png'), width = 6, height = 4)
+```
+
+Get the closest measurement, then average for 30 mins, 1 hr, 6 hr, 12 hr, 24 hr
+
+```{r}
+chlais_aosdates
+aos_datetimes <- phyto_df_myloc_chla$collect_datetime
+my_aos_datetime <- aos_datetimes[1]
+
+get_closest_sensor <- function(my_aos_datetime){
+  min_id <- abs(my_aos_datetime - chlais_aosdates$startDateTime) %>% which.min()
+  my_meas <- chlais_aosdates[min_id,] %>% 
+    mutate(aos_datetime = my_aos_datetime) %>%
+    mutate(timediff = startDateTime - my_aos_datetime)
+  return(my_meas)
+}
+
+chla_matches <- aos_datetimes %>% purrr::map_df(~get_closest_sensor(.x)) %>%
+  left_join(phyto_df_myloc_chla, by = c('aos_datetime' = 'collect_datetime'))
+```
+
+```{r}
+chla_matches %>%
+  ggplot(aes(x = analyteConcentration, y = chlorophyll)) +
+    geom_abline(slope = 1, intercept = 0, lty = 2) +
+  geom_smooth(method = 'lm') +
+  geom_errorbar(aes(ymin = chlorophyll - chlorophyllExpUncert,
+                    ymax = chlorophyll + chlorophyllExpUncert), width = 0.05) +
+  geom_point(pch = 21, aes(fill = as.character(collect_date)), alpha = 0.75) +
+  xlab('AOS samples') +
+  ylab('AIS sensor (closest)') +
+  theme_bw() +
+  ggtitle(glue('{my_siteid} chla'))
+
+ggsave(glue('figs/{my_siteid}-sensor-x-sample-chla.png'), width = 5, height = 2.5)
+```
+
+daily average
+
+```{r}
+get_daily_sensor <- function(my_aos_datetime){
+  my_aos_date <- as_date(my_aos_datetime)
+  my_df <- chlais_aosdates %>% 
+    group_by(siteid, sensor_position, date) %>%
+    dplyr::filter(date %in% my_aos_date) %>%
+    summarise(mean_chl = mean(chlorophyll, na.rm = TRUE), 
+            sd_chl = sd(chlorophyll, na.rm = TRUE)) %>% 
+    mutate(aos_datetime = my_aos_datetime)
+  return(my_df)
+}
+
+chla_matches_daily <- aos_datetimes %>% purrr::map_df(~get_daily_sensor(.x)) %>%
+  left_join(phyto_df_myloc_chla, by = c('aos_datetime' = 'collect_datetime'))
+```
+
+```{r}
+chla_matches_daily %>%
+  ggplot(aes(x = analyteConcentration, y = mean_chl)) +
+  geom_abline(slope = 1, intercept = 0, lty = 2) +
+  geom_smooth(method = 'lm') +
+  geom_errorbar(aes(ymin = mean_chl - sd_chl,
+                    ymax = mean_chl + sd_chl), width = 0.05) +
+  geom_point(pch = 21, aes(fill = as.character(collect_date)), alpha = 0.75) +
+  xlab('AOS samples') +
+  ylab('AIS sensor (daily mean)') +
+  theme_bw() +
+  ggtitle(glue('{my_siteid} chla'))
+
+ggsave(glue('figs/{my_siteid}-sensor-x-sample-chla-daily.png'), width = 5, height = 2.5)
+```

@@ -25,9 +25,13 @@ Searching NEON API for files within a data product. Files are saved in Box
 
 ```{r, eval = FALSE}
 source('R/myfxns.R')
+source('R/my-aos-fxns.R')
 chem_dir <- '~/Box/data/NEON/NEON_chem-surfacewater'
 lake_river_sites <- c('BARC', 'SUGG', 'CRAM', 'LIRO', 'PRPO', 'PRLA', 'TOOK', 'FLNT', 'BLWA', 'TOMB', 'BLUE')
-# TODO: extract update_swchem_files function to source 
+
+lake_river_sites %>% purrr::walk(~update_phyto_files(.x, myglob = 'alg_fieldData'))
+lake_river_sites %>% purrr::walk(~update_phyto_files(.x, 'algaeExternalLabDataPerSample'))
+
 lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'externalLabData'))
 lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'fieldSuperParent'))
 lake_river_sites %>% purrr::walk(~update_swchem_files(.x, myglob = 'swc_fieldData'))
@@ -75,7 +79,7 @@ get_values_site_swchem <- function(my_siteid, my_analyte){
 ```
 
 ```{r}
-my_siteid <- 'BLUE'
+my_siteid <- "PRPO"
 ```
 
 ```{r}
@@ -93,12 +97,12 @@ site_chem_df <- site_chem_df %>%
 read in aop dates for site 
 
 ```{r}
-aop_dates <- read_csv('../spectra/results/spectra-ids.csv') %>%
-  dplyr::filter(siteID == my_siteid) %>%
-  mutate(flightdate = str_sub(flightline, 1, 8)) %>%
-  mutate(flightdate = as_date(flightdate)) %>%
-  dplyr::select(siteID, flightdate, clouds, loctype) %>%
-  mutate(namedLocation = glue('{my_siteid}.AOS.{loctype}'))
+cell_info_join <- read_csv('../spectra/results/l1-info.csv')
+cell_info_site <- cell_info_join %>% dplyr::filter(siteID == my_siteid)
+
+aop_dates <- cell_info_site %>% 
+  dplyr::select(siteID, flightdate, clouds, nmdLctn) %>%
+  rename(namedLocation = nmdLctn)
 ```
 
 ```{r}
@@ -113,7 +117,7 @@ gg <- site_chem_df %>%
   theme_bw() +
   coord_cartesian(ylim = c(0, NA)) +
   theme(legend.position = 'bottom', legend.box="vertical") +
-  ggtitle(glue('{my_siteid} AOS sampling')) +
+  ggtitle(glue('{my_siteid} AOS sampling - surface water chem')) +
   geom_vline(data = aop_dates, aes(xintercept = flightdate, col = clouds)) +
   scale_color_manual(values = list("Green (<10%) cloud cover" = "green", 
                                    "Red (> 50%) cloud cover" = "red", 
@@ -131,18 +135,28 @@ time difference is the number of days before (-) or after (+) the flight time th
 GO through with CRAM or TOOK or LIRO where there are multiple buoy depths to pull all buoy samples/reps
 
 ```{r}
-site_spectra_df <- readxl::read_excel('../spectra/results/spectra-ids.xlsx') %>% 
-  dplyr::filter(siteID == my_siteid)
+# my_siteid <- "BARC"
+# site_spectra_df <- readxl::read_excel('../spectra/results/Master.xlsx', 
+#                                       sheet = 'SpectraPixels-2') %>% 
+#   dplyr::filter(siteID == my_siteid)
+# cell_info_join <- read_csv('../spectra/results/l1-info.csv')
+# cell_info_site <- cell_info_join %>% dplyr::filter(siteID == my_siteid)
+```
 
+```{r}
 # site_spectra_df$spectraID[1]
 # spectra_id <- 'BLUE-S2-20170506_160715'
 # str_split(spectra_id, "-", simplify = TRUE)[,2]
 # my_analyte <- 'DOC'
+# cell_info_site[1,]
+# spectra_id = 1
+# spectra_loc <- cell_info_site[['nmdLctn']][spectra_id]
+# spectra_date <- cell_info_site[['flightdate']][spectra_id]
 
 get_closest_sample <- function(spectra_id, my_analyte){
-  spectra_date <- str_split(spectra_id, "-", simplify = TRUE)[,3] %>%
-    str_sub(1,8) %>% as_date()
-  spectra_loc <- str_split(spectra_id, "-", simplify = TRUE)[,2]
+  spectra_date <- cell_info_site[['flightdate']][spectra_id] %>% as_date()
+  spectra_loc <- cell_info_site[['nmdLctn']][spectra_id]
+  
   my_df <- site_chem_df %>% 
     dplyr::filter(analyte == my_analyte) %>%
     dplyr::filter(str_detect(namedLocation, spectra_loc)) %>%
@@ -160,9 +174,10 @@ get_closest_sample <- function(spectra_id, my_analyte){
 
 ```
 
+> TODO: fix to work with spectra pixels spreadsheet
 
 ```{r}
-match_inputs <- tidyr::expand_grid(site_spectra_df$spectraID, my_analytes) %>%
+match_inputs <- tidyr::expand_grid(1:nrow(cell_info_site), my_analytes) %>%
   dplyr::rename(spectraID = 1, analyte = 2)
 match_df <- purrr::map2_dfr(.x = match_inputs$spectraID,
                             .y = match_inputs$analyte,
@@ -170,12 +185,167 @@ match_df <- purrr::map2_dfr(.x = match_inputs$spectraID,
 ```
 
 ```{r}
+# match_df %>% 
+#   dplyr::select(c(3:8,10)) %>%
+#   filter(namedLocation == 'PRPO.AOS.buoy.c0') %>% 
+#   distinct() %>%
+#   arrange(analyte, collectDate) %>% View()
+```
+
+```{r}
 match_df %>% write_csv(glue('results/spectra-matches/{my_siteid}-spectra-matches.csv'))
+
+```
+
+## secchi depth
+
+```{r}
+secchi_df <- fs::dir_ls('results/secchi-x-site') %>%
+  purrr::map_dfr(~read_csv(.x)) %>%
+  dplyr::select(domainID, siteID, namedLocation, date, clearToBottom, 
+                maxDepth, euphoticDepth, icePresent, secchiMeanDepth, remarks) %>%
+  mutate(datedate = lubridate::as_date(date))
+```
+
+```{r}
+# spectra_df <- readxl::read_excel('../spectra/results/spectra-ids.xlsx', sheet = 'SpectraPixels')
+```
+
+```{r}
+# my_spectra_id = 1
+# spectra_df$flightdate[my_spectra_id]
+# spectra_df$nmdLctn[my_spectra_id]
+# spectra_df$radfile[my_spectra_id]
+
+get_closest_secchi <- function(my_spectra_id){
+  spectra_date <- cell_info_join$flightdate[my_spectra_id] %>% as_date()
+  spectra_loc <- cell_info_join$nmdLctn[my_spectra_id]
+  my_radfile <- cell_info_join$radfile[my_spectra_id]
+  my_df <- secchi_df %>% 
+    dplyr::filter(namedLocation %in% spectra_loc)
+# probably wont work if there are replicates
+# or when multiple buoy depths
+  min_id <- abs(spectra_date - my_df$datedate) %>% which.min()
+  my_samp <- my_df[min_id,] %>% 
+    mutate(timediff = datedate - spectra_date) %>% mutate(radfile = my_radfile)
+  return(my_samp)
+}
+secchi_matches <- 1:nrow(cell_info_join) %>% purrr::map_dfr(~get_closest_secchi(.x))
+secchi_matches %>% write_csv('results/secchi-matches.csv')
 ```
 
 ## chlorophyll a in situ data
 
-now do the same with phytoplankton sampling and taxonomy
+No (good) AOS chlorophyll a data prior to late 2017. 
+
+phytoplankton sampling and taxonomy
+
+Join lab and field data to get sampling positions
+
+```{r}
+phyto_dir2 <- '~/Box/data/NEON-processed/chl-a'
+lake_river_sites %>% purrr::walk(~join_field_and_lab(.x))
+```
+
+```{r}
+chla_analytes <- c('chlorophyll a', 'pheophytin', 'total cholorophyll a')
+
+get_chla_site <- function(mysite, my_analytes){
+  my_files <- fs::dir_ls(phyto_dir2, glob = glue("*{mysite}*"))
+  chla_coltypes <- cols(
+    domainID = col_character(),
+    siteID = col_character(),
+    namedLocation = col_character(),
+    collectDate = col_date(format = ""),
+    sampleID = col_character(),
+    sampleCondition = col_character(),
+    replicate = col_double(),
+    analyte = col_character(),
+    analyteConcentration = col_double(),
+    plantAlgaeLabUnits = col_character(),
+    externalLabDataQF = col_character(),
+    parentSampleID = col_character(),
+    aquaticSiteType = col_character(),
+    collect_date = col_date(format = ""),
+    time_hms = col_time(format = ""),
+    habitatType = col_character(),
+    algalSampleType = col_character(),
+    phytoDepth1 = col_double(),
+    phytoDepth2 = col_double(),
+    phytoDepth3 = col_double(),
+    substratumSizeClass = col_character())
+  phyto_df <- read_csv(my_files, col_types = chla_coltypes)
+  site_values <- phyto_df %>% dplyr::filter(analyte %in% my_analytes)
+  site_values_simp <- site_values
+  return(site_values_simp)
+}
+
+phyto_df <- lake_river_sites %>% purrr::map_dfr(~get_chla_site(.x, chla_analytes))
+
+phyto_df$algalSampleType %>% table()
+phyto_df_sub <- phyto_df %>% 
+  dplyr::filter(algalSampleType %in% c('seston', 'phytoplankton'))
+
+# phyto_df_sub$externalLabDataQF %>% table()
+```
+
+```{r}
+my_siteid <- 'BARC'
+cell_info_join <- read_csv('../spectra/results/l1-info.csv')
+cell_info_site <- cell_info_join %>% dplyr::filter(siteID == my_siteid)
+
+aop_dates <- cell_info_site %>% 
+  dplyr::select(siteID, flightdate, clouds, nmdLctn) %>%
+  rename(namedLocation = nmdLctn)
+
+phyto_df_mysite <- phyto_df_sub %>% dplyr::filter(siteID == my_siteid) 
+
+# phyto_df_mysite %>%
+#    ggplot(aes(x = as_date(collectDate), y = analyteConcentration)) +
+#   facet_grid(vars(analyte), vars(namedLocation), scales = 'free_y') +
+#   # facet_wrap(vars(analyte), scales = 'free_y') +
+#   theme_bw() +
+#   coord_cartesian(ylim = c(0, NA)) +
+#   theme(legend.position = 'bottom', legend.box="vertical") +
+#   ggtitle(glue('{my_siteid} AOS sampling - chlorophyll')) +
+#   geom_vline(data = aop_dates, aes(xintercept = flightdate, col = clouds)) +
+#   scale_color_manual(values = list("Green (<10%) cloud cover" = "green", 
+#                                    "Red (> 50%) cloud cover" = "red", 
+#                                    "Yellow (10 - 50%) cloud cover" = "orange")) +
+#   geom_line(col = 'gray') +
+#   geom_point(aes(fill = sampleCondition), pch = 21, size = 2) +
+#   scale_fill_viridis_d() +
+#   xlab(element_blank()) +
+#   expand_limits(xmin = min(aop_dates$flightdate), xmax = max(aop_dates$flightdate))
+#   
+# ggsave(glue('figs/{my_siteid}-AOSxAOP-chl.png'), width = 9, height = 5)
+
+```
+
+```{r}
+
+spectra_id = 1
+spectra_loc <- cell_info_site[['nmdLctn']][spectra_id]
+spectra_date <- cell_info_site[['flightdate']][spectra_id]
+my_analyte <- 'chlorophyll a'
+# get_closest_sample <- function(spectra_id, my_analyte){
+  spectra_date <- cell_info_site[['flightdate']][spectra_id] %>% as_date()
+  spectra_loc <- cell_info_site[['nmdLctn']][spectra_id]
+  
+  my_df <- phyto_df_mysite %>% 
+    dplyr::filter(analyte == my_analyte) %>%
+    dplyr::filter(str_detect(namedLocation, spectra_loc)) %>%
+    mutate(collectDateDate = as_date(collectDate))
+# probably wont work if there are replicates
+# or when multiple buoy depths
+  min_id <- abs(spectra_date - my_df$collectDateDate) %>% which.min()
+  my_samp <- my_df[min_id,] %>% 
+    mutate(timediff = collectDateDate - spectra_date) %>%
+    mutate(spectra_date = spectra_date)
+  return(my_samp)
+# }
+```
+
 
 ## sensor data
 
